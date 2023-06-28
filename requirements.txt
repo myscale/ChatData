@@ -1,0 +1,10 @@
+langchain @ git+https://github.com/myscale/langchain.git@master
+InstructorEmbedding
+pandas
+sentence_transformers
+streamlit==1.21
+altair==4.2.2
+clickhouse-connect
+openai
+lark
+tiktoken
