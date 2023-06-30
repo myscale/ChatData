@@ -49,12 +49,11 @@ After creating the cluster, the next step is to create a table that is compatibl
 Use the following script to create a MyScale VectorStore table:
 
 ```sql
-CREATE TABLE default. langchain (
+CREATE TABLE default.langchain (
     `abstract` String,
     `id` String,
     `vector` Array(Float32),
     `metadata` Object('JSON'),
-    VECTOR INDEX vec_idx vector TYPE MSTG('metric_type=Cosine'),
     CONSTRAINT vec_len CHECK length(vector) = 768)
 ENGINE = ReplacingMergeTree ORDER BY id
 ```
@@ -76,13 +75,7 @@ Great. Let’s move onto the next step.
 > We have appended additional metadata, like the publication date and authors, to each ArXiv entry.
 
 Our data is hosted on [Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html), supported by [Clickhouse table functions](https://clickhouse.com/docs/en/sql-reference/table-functions/s3).
- Here are the links, the data is partitioned by published year:
-
-1. [1980 - 1989](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-198.jsonl.zstd)
-2. [1990 - 1999](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-199.jsonl.zstd)
-3. [2000 - 2009](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-200.jsonl.zstd)
-4. [2010 - 2019](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-201.jsonl.zstd)
-5. [2020 - 2023](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-202.jsonl.zstd)
+The compressed `jsonl` file is available [here](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/full.jsonl.zst). You can also import data from our AWS S3 bucket (the URL will look like `https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.*.jsonl.zst`) to your MyScale Cloud with [S3 table function](https://clickhouse.com/docs/en/sql-reference/table-functions/s3).
 
 > You can also upload the data onto Google Cloud Platform and use the same SQL insert query to import this data.
 
@@ -98,10 +91,16 @@ SELECT
   *
 FROM
   s3(
-    'https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data-*.jsonl.zstd',
+    'https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.*.jsonl.zstd',
     'JSONEachRow',
-    'abstract String, id String, vector Array(Float32), metadata Object(''JSON'')'
+    'abstract String, id String, vector Array(Float32), metadata Object(''JSON'')',
+    'zstd'
   )
+```
+
+Then you need to build the vector index with this SQL:
+```sql
+ALTER TABLE langchain ADD VECTOR INDEX vec_idx vector TYPE MSTG('metric_type=Cosine')
 ```
 
 ### LangChain
