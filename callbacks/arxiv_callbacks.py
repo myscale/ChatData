@@ -1,7 +1,8 @@
 import streamlit as st
+from sql_formatter.core import format_sql
 from langchain.callbacks.streamlit.streamlit_callback_handler import StreamlitCallbackHandler
 
-class ChatDataSearchCallBackHandler(StreamlitCallbackHandler):
+class ChatDataSelfSearchCallBackHandler(StreamlitCallbackHandler):
     def __init__(self) -> None:
         self.progress_bar = st.progress(value=0.0, text="Working...")
         self.tokens_stream = ""
@@ -20,7 +21,7 @@ class ChatDataSearchCallBackHandler(StreamlitCallbackHandler):
     def on_chain_start(self, serialized, inputs, **kwargs) -> None:
         pass
 
-class ChatDataAskCallBackHandler(StreamlitCallbackHandler):
+class ChatDataSelfAskCallBackHandler(StreamlitCallbackHandler):
     def __init__(self) -> None:
         self.progress_bar = st.progress(value=0.0, text='Searching DB...')
         self.status_bar = st.empty()
@@ -46,5 +47,25 @@ class ChatDataAskCallBackHandler(StreamlitCallbackHandler):
             self.prog_value += 0.1
             self.progress_bar.progress(value=self.prog_value, text=f'Running Chain `{cid}`...')
 
+    def on_chain_end(self, outputs, **kwargs) -> None:
+        pass
+    
+
+class ChatDataSQLSearchCallBackHandler(StreamlitCallbackHandler):
+    def __init__(self) -> None:
+        self.progress_bar = st.progress(value=0.0, text='Searching DB...')
+        self.status_bar = st.empty()
+
+    def on_llm_start(self, serialized, prompts, **kwargs) -> None:
+        pass
+        
+    def on_text(self, text: str, **kwargs) -> None:
+        if text.startswith('SELECT'):
+            st.write('We generated Vector SQL for you:')
+            st.markdown(f'''```sql\n{format_sql(text, max_len=80)}\n```''')
+        
+    def on_chain_start(self, serialized, inputs, **kwargs) -> None:
+       pass
+   
     def on_chain_end(self, outputs, **kwargs) -> None:
         pass

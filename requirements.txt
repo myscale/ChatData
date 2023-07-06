@@ -1,4 +1,4 @@
-langchain @ git+https://github.com/myscale/langchain.git@master
+langchain @ git+https://github.com/myscale/langchain.git@preview
 InstructorEmbedding
 pandas
 sentence_transformers
@@ -8,3 +8,4 @@ clickhouse-connect
 openai
 lark
 tiktoken
+sql-formatter
