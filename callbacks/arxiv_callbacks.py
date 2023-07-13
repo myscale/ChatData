@@ -53,8 +53,14 @@ class ChatDataSelfAskCallBackHandler(StreamlitCallbackHandler):
 
 class ChatDataSQLSearchCallBackHandler(StreamlitCallbackHandler):
     def __init__(self) -> None:
-        self.progress_bar = st.progress(value=0.0, text='Searching DB...')
+        self.progress_bar = st.progress(value=0.0, text='Writing SQL...')
         self.status_bar = st.empty()
+        self.prog_value = 0
+        self.prog_map = {
+            'langchain.chains.qa_with_sources.retrieval.RetrievalQAWithSourcesChain': 0.5,
+            'langchain.chains.combine_documents.map_reduce.MapReduceDocumentsChain': 0.6,
+            'langchain.chains.combine_documents.stuff.StuffDocumentsChain': 0.7
+        }
 
     def on_llm_start(self, serialized, prompts, **kwargs) -> None:
         pass
@@ -63,9 +69,17 @@ class ChatDataSQLSearchCallBackHandler(StreamlitCallbackHandler):
         if text.startswith('SELECT'):
             st.write('We generated Vector SQL for you:')
             st.markdown(f'''```sql\n{format_sql(text, max_len=80)}\n```''')
+            self.prog_value += 0.1
+            self.progress_bar.progress(value=self.prog_value, text="Searching in DB...")
         
     def on_chain_start(self, serialized, inputs, **kwargs) -> None:
-       pass
+        cid = '.'.join(serialized['id']) 
+        if cid != 'langchain.chains.llm.LLMChain':
+            self.progress_bar.progress(value=self.prog_map[cid], text=f'Running Chain `{cid}`...')
+            self.prog_value = self.prog_map[cid]
+        else:
+            self.prog_value += 0.1
+            self.progress_bar.progress(value=self.prog_value, text=f'Running Chain `{cid}`...')
    
     def on_chain_end(self, outputs, **kwargs) -> None:
         pass

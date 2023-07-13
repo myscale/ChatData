@@ -9,3 +9,4 @@ openai
 lark
 tiktoken
 sql-formatter
+clickhouse-sqlalchemy

@@ -21,6 +21,7 @@ Never query for all columns from a table. You must query only the columns that a
 Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.
 Pay attention to use today() function to get the current date, if the question involves "today". `ORDER BY` clause should always be after `WHERE` clause. DO NOT add semicolon to the end of SQL. Pay attention to the comment in table schema.
 Pay attention to the data type when using functions. Always use `AND` to connect conditions in `WHERE` and never use comma.
+Make sure you never write an isolated `WHERE` keyword and never use undesired condition to conrtain the query.
 
 Use the following format:
 
@@ -29,6 +30,21 @@ Use the following format:
 
 Question: "Question here"
 SQLQuery: "SQL Query to run"
+
+
+Here are some examples:
+
+======== table info ========
+CREATE TABLE "ChatPaper" (
+	abstract String, 
+	id String, 
+	vector Array(Float32), 
+) ENGINE = ReplicatedReplacingMergeTree()
+ ORDER BY id
+ PRIMARY KEY id
+ 
+Question: What is Feartue Pyramid Network?
+SQLQuery: SELECT ChatPaper.title, ChatPaper.id, ChatPaper.authors FROM ChatPaper ORDER BY DISTANCE(vector, NeuralArray(PaperRank contribution)) LIMIT {top_k}
 
 
 ======== table info ========
@@ -45,17 +61,36 @@ CREATE TABLE "ChatPaper" (
  ORDER BY id
  PRIMARY KEY id
  
-Question: What is PaperRank? What is the contribution of those works? Use paper with more than 2 categories and whose title like PageRank.
-SQLQuery: SELECT ChatPaper.title, ChatPaper.id, ChatPaper.authors FROM ChatPaper WHERE length(categories) > 2 AND title LIKE '%PageRank%' ORDER BY DISTANCE(vector, NeuralArray(PaperRank contribution)) LIMIT {top_k}
+Question: What is PaperRank? What is the contribution of those works? Use paper with more than 2 categories.
+SQLQuery: SELECT ChatPaper.title, ChatPaper.id, ChatPaper.authors FROM ChatPaper WHERE length(categories) > 2 ORDER BY DISTANCE(vector, NeuralArray(PaperRank contribution)) LIMIT {top_k}
 
 
 ======== table info ========
 CREATE TABLE "ChatArXiv" (
+	primary_category String
+	categories Array(String), 
+	pubdate DateTime, 
 	abstract String, 
-        categories Array(String), 
+	title String, 
+	paper_id String, 
+	vector Array(Float32), 
+	authors Array(String), 
+) ENGINE = MergeTree()
+ ORDER BY paper_id
+ PRIMARY KEY paper_id
+ 
+Question: Did Geoffrey Hinton wrote about Capsule Neural Networks? Please use articles published later than 2021.
+SQLQuery: SELECT ChatArXiv.title, ChatArXiv.paper_id, ChatArXiv.authors FROM ChatArXiv WHERE has(authors, 'Geoffrey Hinton') AND pubdate > parseDateTimeBestEffort('2021-01-01') ORDER BY DISTANCE(vector, NeuralArray(Capsule Neural Networks)) LIMIT {top_k}
+
+
+======== table info ========
+CREATE TABLE "PaperDatabase" (
+	abstract String, 
+	categories Array(String), 
 	vector Array(Float32), 
 	pubdate DateTime, 
 	id String, 
+	comments String,
 	title String, 
 	authors Array(String), 
 	primary_category String
@@ -63,11 +98,14 @@ CREATE TABLE "ChatArXiv" (
  ORDER BY id
  PRIMARY KEY id
  
-Question: What is neural network? Please use articles published by Geoffrey Hinton after 2019 in category `cs.CV`.
-SQLQuery: SELECT ChatArXiv.title, ChatArXiv.id, ChatArXiv.authors FROM ChatArXiv WHERE has(categories, 'cs.CV'), has(authors, 'Geoffrey Hinton') AND pubdate > parseDateTimeBestEffort('2019-01-01') ORDER BY DISTANCE(vector, NeuralArray(neural network)) LIMIT {top_k}
+Question: Find papers whose abstract has Mutual Information in it.
+SQLQuery: SELECT PaperDatabase.title, PaperDatabase.id FROM PaperDatabase WHERE abstract ILIKE '%Mutual Information%' ORDER BY DISTANCE(vector, NeuralArray(Mutual Information)) LIMIT {top_k}
+
  
+Let's begin:
 
 ======== table info ========
 {table_info}
 
-Question: {input}"""
+Question: {input}
+SQLQuery: """

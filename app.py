@@ -25,6 +25,7 @@ from langchain.retrievers import SQLDatabaseChainRetriever
 
 
 environ['TOKENIZERS_PARALLELISM'] = 'true'
+environ['OPENAI_API_BASE'] = 'https://one-api.myscale.cloud/v1'
 
 st.set_page_config(page_title="ChatData")
 
@@ -48,7 +49,7 @@ def display(dataframe, columns=None):
     else:
         st.write("Sorry 😵 we didn't find any articles related to your query.\n\nMaybe the LLM is too naughty that does not follow our instruction... \n\nPlease try again and use verbs that may match the datatype.", unsafe_allow_html=True)
 
-@st.cache_resource 
+@st.cache_resource
 def build_retriever():
     with st.spinner("Loading Model..."):
         embeddings = HuggingFaceInstructEmbeddings(
@@ -105,59 +106,60 @@ def build_retriever():
             doc_search, "Scientific papers indexes with abstracts. All in English.", metadata_field_info,
             use_original_query=False)
 
-        with st.spinner('Building RetrievalQAWith SourcesChain...'):
-            document_with_metadata_prompt = PromptTemplate(
-                input_variables=["page_content", "id", "title", "authors", "pubdate", "categories"],
-                template="Content:\n\tTitle: {title}\n\tAbstract: {page_content}\n\tAuthors: {authors}\n\tpubdate: {pubdate}\n\tCategories: {categories}\nSOURCE: {id}")
-            COMBINE_PROMPT = PromptTemplate(
-                template=combine_prompt_template, input_variables=["summaries", "question"])
-            chain = RetrievalQAWithSourcesChain.from_chain_type(
-                ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
-                retriever=retriever,
-                chain_type='stuff', 
-                chain_type_kwargs = {
-                    'prompt': COMBINE_PROMPT,
-                    'document_prompt': document_with_metadata_prompt,
-                }, return_source_documents=True)
-        with st.spinner('Building Vector SQL Database Chain'):
-            MYSCALE_USER = st.secrets['MYSCALE_USER']
-            MYSCALE_PASSWORD = st.secrets['MYSCALE_PASSWORD']
-            MYSCALE_HOST = st.secrets['MYSCALE_HOST']
-            MYSCALE_PORT = st.secrets['MYSCALE_PORT']
-            engine = create_engine(f'clickhouse://{MYSCALE_USER}:{MYSCALE_PASSWORD}@{MYSCALE_HOST}:{MYSCALE_PORT}/default?protocol=https')
-            metadata = MetaData(bind=engine)
-            PROMPT = PromptTemplate(
-                input_variables=["input", "table_info", "top_k"],
-                template=_myscale_prompt,
+    with st.spinner('Building RetrievalQAWith SourcesChain...'):
+        document_with_metadata_prompt = PromptTemplate(
+            input_variables=["page_content", "id", "title", "authors", "pubdate", "categories"],
+            template="Content:\n\tTitle: {title}\n\tAbstract: {page_content}\n\tAuthors: {authors}\n\tDate of Publication: {pubdate}\n\tCategories: {categories}\nSOURCE: {id}")
+        COMBINE_PROMPT = PromptTemplate(
+            template=combine_prompt_template, input_variables=["summaries", "question"])
+        chain = RetrievalQAWithSourcesChain.from_chain_type(
+            ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
+            retriever=retriever,
+            chain_type='stuff', 
+            chain_type_kwargs = {
+                'prompt': COMBINE_PROMPT,
+                'document_prompt': document_with_metadata_prompt,
+            }, return_source_documents=True)
+        
+    with st.spinner('Building Vector SQL Database Chain'):
+        MYSCALE_USER = st.secrets['MYSCALE_USER']
+        MYSCALE_PASSWORD = st.secrets['MYSCALE_PASSWORD']
+        MYSCALE_HOST = st.secrets['MYSCALE_HOST']
+        MYSCALE_PORT = st.secrets['MYSCALE_PORT']
+        engine = create_engine(f'clickhouse://{MYSCALE_USER}:{MYSCALE_PASSWORD}@{MYSCALE_HOST}:{MYSCALE_PORT}/default?protocol=https')
+        metadata = MetaData(bind=engine)
+        PROMPT = PromptTemplate(
+            input_variables=["input", "table_info", "top_k"],
+            template=_myscale_prompt,
+        )
+        class VectorSQLRAllOutputParser(VectorSQLOutputParser):
+            def parse(self, text):
+                text = super().parse(text)
+                start = text.upper().find('SELECT')
+                if start >= 0:
+                    end = text.upper().find('FROM')
+                    text = text.replace(text[start+len('SELECT')+1:end-1], ', '.join(columns))
+                return text
+                
+        
+        output_parser = VectorSQLRAllOutputParser.from_embeddings(model=embeddings)
+        sql_query_chain = SQLDatabaseChain(
+            llm_chain=LLMChain(llm=OpenAI(openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0), prompt=PROMPT,), 
+            top_k=10,
+            return_direct=True,
+            database=SQLDatabase(engine, None, metadata, max_string_length=1024),
+            sql_cmd_parser=output_parser,
+            native_format=True
             )
-            class VectorSQLRAllOutputParser(VectorSQLOutputParser):
-                def parse(self, text):
-                    text = super().parse(text)
-                    start = text.upper().find('SELECT')
-                    if start >= 0:
-                        end = text.upper().find('FROM')
-                        text = text.replace(text[start+len('SELECT')+1:end-1], ', '.join(columns))
-                    return text
-                    
-            
-            output_parser = VectorSQLRAllOutputParser.from_embeddings(model=embeddings)
-            sql_query_chain = SQLDatabaseChain(
-                llm_chain=LLMChain(llm=OpenAI(openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0), prompt=PROMPT,), 
-                top_k=10,
-                return_direct=True,
-                database=SQLDatabase(engine, None, metadata, max_string_length=1024),
-                sql_cmd_parser=output_parser,
-                native_format=True
-                )
-            sql_retriever = SQLDatabaseChainRetriever(sql_db_chain=sql_query_chain, page_content_key="abstract")
-            sql_chain = RetrievalQAWithSourcesChain.from_chain_type(
-                ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
-                retriever=sql_retriever,
-                chain_type='stuff', 
-                chain_type_kwargs = {
-                    'prompt': COMBINE_PROMPT,
-                    'document_prompt': document_with_metadata_prompt,
-                }, return_source_documents=True)
+        sql_retriever = SQLDatabaseChainRetriever(sql_db_chain=sql_query_chain, page_content_key="abstract")
+        sql_chain = RetrievalQAWithSourcesChain.from_chain_type(
+            ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
+            retriever=sql_retriever,
+            chain_type='stuff', 
+            chain_type_kwargs = {
+                'prompt': COMBINE_PROMPT,
+                'document_prompt': document_with_metadata_prompt,
+            }, return_source_documents=True)
             
     return [{'name': m.name, 'desc': m.description, 'type': m.type} for m in metadata_field_info], retriever, chain, sql_retriever, sql_chain
 
@@ -190,7 +192,7 @@ CREATE TABLE default.ChatArXiv (
     `primary_category` String,
     VECTOR INDEX vec_idx vector TYPE MSTG('metric_type=Cosine'), 
     CONSTRAINT vec_len CHECK length(vector) = 768) 
-ENGINE = ReplacingMergeTree ORDER BY id SETTINGS index_granularity = 8192
+ENGINE = ReplacingMergeTree ORDER BY id
 ```''')
     
     st.text_input("Ask a question:", key='query_sql')
@@ -226,8 +228,10 @@ ENGINE = ReplacingMergeTree ORDER BY id SETTINGS index_granularity = 8192
                 docs = ret['source_documents']
                 ref = re.findall(
                     '(http://arxiv.org/abs/\d{4}.\d+v\d)', ret['sources'])
+                ref += re.findall(
+                    '(http://arxiv.org/abs/\d{4}.\d+v\d)', ret['answer'])
                 docs = pd.DataFrame([{**d.metadata, 'abstract': d.page_content}
-                                    for d in docs if d.metadata['id'] in ref])
+                                    for d in docs if d.metadata['id'] in set(ref)])
                 display(docs, columns)
             except Exception as e:
                 raise e
@@ -274,8 +278,10 @@ with tab_self_query:
                 docs = ret['source_documents']
                 ref = re.findall(
                     '(http://arxiv.org/abs/\d{4}.\d+v\d)', ret['sources'])
+                ref += re.findall(
+                    '(http://arxiv.org/abs/\d{4}.\d+v\d)', ret['answer'])
                 docs = pd.DataFrame([{**d.metadata, 'abstract': d.page_content}
-                                    for d in docs if d.metadata['id'] in ref])
+                                    for d in docs if d.metadata['id'] in set(ref)])
                 display(docs, columns)
             except Exception as e:
                 st.write('Oops 😵 Something bad happened...')
