@@ -14,7 +14,8 @@ from langchain.chat_models import ChatOpenAI
 
 from prompts.arxiv_prompt import combine_prompt_template, _myscale_prompt
 from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
-    ChatDataSelfAskCallBackHandler, ChatDataSQLSearchCallBackHandler
+    ChatDataSelfAskCallBackHandler, ChatDataSQLSearchCallBackHandler, \
+    ChatDataSQLAskCallBackHandler
 from langchain.prompts.prompt import PromptTemplate
 from sqlalchemy import create_engine, MetaData
 from langchain.chains.sql_database.base import SQLDatabaseChain
@@ -33,6 +34,7 @@ st.header("ChatData")
 
 columns = ['title', 'id', 'categories', 'abstract', 'authors', 'pubdate']
 
+
 def try_eval(x):
     try:
         return eval(x, {'datetime': datetime})
@@ -48,6 +50,7 @@ def display(dataframe, columns=None):
             st.dataframe(dataframe)
     else:
         st.write("Sorry 😵 we didn't find any articles related to your query.\n\nMaybe the LLM is too naughty that does not follow our instruction... \n\nPlease try again and use verbs that may match the datatype.", unsafe_allow_html=True)
+
 
 @st.cache_resource
 def build_retriever():
@@ -108,59 +111,68 @@ def build_retriever():
 
     with st.spinner('Building RetrievalQAWith SourcesChain...'):
         document_with_metadata_prompt = PromptTemplate(
-            input_variables=["page_content", "id", "title", "authors", "pubdate", "categories"],
+            input_variables=["page_content", "id", "title",
+                             "authors", "pubdate", "categories"],
             template="Content:\n\tTitle: {title}\n\tAbstract: {page_content}\n\tAuthors: {authors}\n\tDate of Publication: {pubdate}\n\tCategories: {categories}\nSOURCE: {id}")
         COMBINE_PROMPT = PromptTemplate(
             template=combine_prompt_template, input_variables=["summaries", "question"])
         chain = RetrievalQAWithSourcesChain.from_chain_type(
-            ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
+            ChatOpenAI(model_name='gpt-3.5-turbo-16k',
+                       openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6),
             retriever=retriever,
-            chain_type='stuff', 
-            chain_type_kwargs = {
+            chain_type='stuff',
+            chain_type_kwargs={
                 'prompt': COMBINE_PROMPT,
                 'document_prompt': document_with_metadata_prompt,
             }, return_source_documents=True)
-        
+
     with st.spinner('Building Vector SQL Database Chain'):
         MYSCALE_USER = st.secrets['MYSCALE_USER']
         MYSCALE_PASSWORD = st.secrets['MYSCALE_PASSWORD']
         MYSCALE_HOST = st.secrets['MYSCALE_HOST']
         MYSCALE_PORT = st.secrets['MYSCALE_PORT']
-        engine = create_engine(f'clickhouse://{MYSCALE_USER}:{MYSCALE_PASSWORD}@{MYSCALE_HOST}:{MYSCALE_PORT}/default?protocol=https')
+        engine = create_engine(
+            f'clickhouse://{MYSCALE_USER}:{MYSCALE_PASSWORD}@{MYSCALE_HOST}:{MYSCALE_PORT}/default?protocol=https')
         metadata = MetaData(bind=engine)
         PROMPT = PromptTemplate(
             input_variables=["input", "table_info", "top_k"],
             template=_myscale_prompt,
         )
+
         class VectorSQLRAllOutputParser(VectorSQLOutputParser):
             def parse(self, text):
                 text = super().parse(text)
                 start = text.upper().find('SELECT')
                 if start >= 0:
                     end = text.upper().find('FROM')
-                    text = text.replace(text[start+len('SELECT')+1:end-1], ', '.join(columns))
+                    text = text.replace(
+                        text[start+len('SELECT')+1:end-1], ', '.join(columns))
                 return text
-                
-        
-        output_parser = VectorSQLRAllOutputParser.from_embeddings(model=embeddings)
+
+        output_parser = VectorSQLRAllOutputParser.from_embeddings(
+            model=embeddings)
         sql_query_chain = SQLDatabaseChain(
-            llm_chain=LLMChain(llm=OpenAI(openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0), prompt=PROMPT,), 
+            llm_chain=LLMChain(llm=OpenAI(
+                openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0), prompt=PROMPT,),
             top_k=10,
             return_direct=True,
-            database=SQLDatabase(engine, None, metadata, max_string_length=1024),
+            database=SQLDatabase(engine, None, metadata,
+                                 max_string_length=1024),
             sql_cmd_parser=output_parser,
             native_format=True
-            )
-        sql_retriever = SQLDatabaseChainRetriever(sql_db_chain=sql_query_chain, page_content_key="abstract")
+        )
+        sql_retriever = SQLDatabaseChainRetriever(
+            sql_db_chain=sql_query_chain, page_content_key="abstract")
         sql_chain = RetrievalQAWithSourcesChain.from_chain_type(
-            ChatOpenAI(model_name='gpt-3.5-turbo-16k', openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6), 
+            ChatOpenAI(model_name='gpt-3.5-turbo-16k',
+                       openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0.6),
             retriever=sql_retriever,
-            chain_type='stuff', 
-            chain_type_kwargs = {
+            chain_type='stuff',
+            chain_type_kwargs={
                 'prompt': COMBINE_PROMPT,
                 'document_prompt': document_with_metadata_prompt,
             }, return_source_documents=True)
-            
+
     return [{'name': m.name, 'desc': m.description, 'type': m.type} for m in metadata_field_info], retriever, chain, sql_retriever, sql_chain
 
 
@@ -171,13 +183,19 @@ if 'retriever' not in st.session_state:
         st.session_state['sql_retriever'], \
         st.session_state['sql_chain'] = build_retriever()
 
-st.info("We provides you metadata columns below for query. Please choose a natural expression to describe filters on those columns.\n\n" +
-        "For example: \n\n- What is a Bayesian network? Please use articles published later than Feb 2018 and with more than 2 categories and whose title like `computer` and must have `cs.CV` in its category.\n" +
-        "- What is neural network? Please use articles published by Geoffrey Hinton after 2018.\n" +
-        "- Introduce some papers that uses Generative Adversarial Networks published around 2019.")
+st.info("We provides you metadata columns below for query. Please choose a natural expression to describe filters on those columns.\n\n"
+        "For example: \n\n"
+        "*If you want to search papers with complex filters*:\n\n"
+        "- What is a Bayesian network? Please use articles published later than Feb 2018 and with more than 2 categories and whose title like `computer` and must have `cs.CV` in its category.\n\n"
+        "*If you want to ask questions based on papers in database*:\n\n"
+        "- What is PageRank?\n"
+        "- Did Geoffrey Hinton wrote paper about Capsule Neural Networks?\n"
+        "- Introduce some applications of GANs published around 2019.\n"
+        "- 请根据 2019 年左右的文章介绍一下 GAN 的应用都有哪些\n"
+        "- Veuillez présenter les applications du GAN sur la base des articles autour de 2019 ?")
 tab_sql, tab_self_query = st.tabs(['Vector SQL', 'Self-Query Retrievers'])
 with tab_sql:
-    st.info("You can retrieve papers with button `Query`", icon='💡')
+    st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.", icon='💡')
     st.markdown('''```sql
 CREATE TABLE default.ChatArXiv (
     `abstract` String, 
@@ -194,7 +212,7 @@ CREATE TABLE default.ChatArXiv (
     CONSTRAINT vec_len CHECK length(vector) = 768) 
 ENGINE = ReplacingMergeTree ORDER BY id
 ```''')
-    
+
     st.text_input("Ask a question:", key='query_sql')
     cols = st.columns([1, 1, 7])
     cols[0].button("Query", key='search_sql')
@@ -202,23 +220,25 @@ ENGINE = ReplacingMergeTree ORDER BY id
     plc_hldr = st.empty()
     if st.session_state.search_sql:
         plc_hldr = st.empty()
+        print(st.session_state.query_sql)
         with plc_hldr.expander('Query Log', expanded=True):
+            callback = ChatDataSQLSearchCallBackHandler()
             try:
                 docs = st.session_state.sql_retriever.get_relevant_documents(
-                    st.session_state.query_sql, callbacks=[ChatDataSQLSearchCallBackHandler()])
+                    st.session_state.query_sql, callbacks=[callback])
+                callback.progress_bar.progress(value=1.0, text="Done!")
                 docs = pd.DataFrame(
                     [{**d.metadata, 'abstract': d.page_content} for d in docs])
                 display(docs)
             except Exception as e:
                 raise e
                 st.write('Oops 😵 Something bad happened...')
-                
+
     if st.session_state.ask_sql:
         plc_hldr = st.empty()
-        ctx = st.container()
+        print(st.session_state.query_sql)
         with plc_hldr.expander('Chat Log', expanded=True):
-            call_back = None
-            callback = ChatDataSQLSearchCallBackHandler()
+            callback = ChatDataSQLAskCallBackHandler()
             try:
                 ret = st.session_state.sql_chain(
                     st.session_state.query_sql, callbacks=[callback])
@@ -236,8 +256,8 @@ ENGINE = ReplacingMergeTree ORDER BY id
             except Exception as e:
                 raise e
                 st.write('Oops 😵 Something bad happened...')
-    
-    
+
+
 with tab_self_query:
     st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.", icon='💡')
     st.dataframe(st.session_state.metadata_columns)
@@ -248,6 +268,7 @@ with tab_self_query:
     plc_hldr = st.empty()
     if st.session_state.search_self:
         plc_hldr = st.empty()
+        print(st.session_state.query_self)
         with plc_hldr.expander('Query Log', expanded=True):
             call_back = None
             callback = ChatDataSelfSearchCallBackHandler()
@@ -265,7 +286,7 @@ with tab_self_query:
 
     if st.session_state.ask_self:
         plc_hldr = st.empty()
-        ctx = st.container()
+        print(st.session_state.query_self)
         with plc_hldr.expander('Chat Log', expanded=True):
             call_back = None
             callback = ChatDataSelfAskCallBackHandler()
