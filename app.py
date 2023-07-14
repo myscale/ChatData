@@ -19,7 +19,7 @@ from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
 from langchain.prompts.prompt import PromptTemplate
 from sqlalchemy import create_engine, MetaData
 from langchain.chains.sql_database.base import SQLDatabaseChain
-from langchain.chains.sql_database.parser import VectorSQLOutputParser
+from langchain.chains.sql_database.parser import VectorSQLRetrieveAllOutputParser
 from langchain.chains import LLMChain
 from langchain.sql_database import SQLDatabase
 from langchain.retrievers import SQLDatabaseChainRetriever
@@ -139,25 +139,14 @@ def build_retriever():
             template=_myscale_prompt,
         )
 
-        class VectorSQLRAllOutputParser(VectorSQLOutputParser):
-            def parse(self, text):
-                text = super().parse(text)
-                start = text.upper().find('SELECT')
-                if start >= 0:
-                    end = text.upper().find('FROM')
-                    text = text.replace(
-                        text[start+len('SELECT')+1:end-1], ', '.join(columns))
-                return text
-
-        output_parser = VectorSQLRAllOutputParser.from_embeddings(
+        output_parser = VectorSQLRetrieveAllOutputParser.from_embeddings(
             model=embeddings)
-        sql_query_chain = SQLDatabaseChain(
-            llm_chain=LLMChain(llm=OpenAI(
-                openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0), prompt=PROMPT,),
+        sql_query_chain = SQLDatabaseChain.from_llm(
+            llm=OpenAI(openai_api_key=st.secrets['OPENAI_API_KEY'], temperature=0),
+            prompt=PROMPT,
             top_k=10,
             return_direct=True,
-            database=SQLDatabase(engine, None, metadata,
-                                 max_string_length=1024),
+            db=SQLDatabase(engine, None, metadata, max_string_length=1024),
             sql_cmd_parser=output_parser,
             native_format=True
         )
