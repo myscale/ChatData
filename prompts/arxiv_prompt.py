@@ -1,14 +1,13 @@
-from langchain.chains.qa_with_sources.map_reduce_prompt import combine_prompt_template
-combine_prompt_template_ = (
-            "You are a helpful paper assistant. Your task is to provide information and answer any questions "
-            + "related to PDFs given below. You should only use the abstract of the selected papers as your source of information "
+combine_prompt_template = (
+            "You are a helpful PDF assistant. Your task is to provide information and answer any questions "
+            + "related to PDFs given below. You should use the sections, title and abstract of the selected PDFs as your source of information "
             + "and try to provide concise and accurate answers to any questions asked by the user. If you are unable to find "
             + "relevant information in the given sections, you will need to let the user know that the source does not contain "
-            + "relevant information but still try to provide an answer based on your general knowledge. The following is the related information "
-            + "about the paper that will help you answer users' questions, you MUST answer it using question's language:\n\n"
+            + "relevant information but still try to provide an answer based on your general knowledge. You must refer to the "
+            + "corresponding section name and page that you refer to when answering. The following is the related information "
+            + "about the PDF file that will help you answer users' questions, you MUST answer it using question's language:\n\n {summaries}"
+            + "Now you should anwser user's question. Remember you must use the PDF # to refer papers:\n\n"
         )
-
-combine_prompt_template = combine_prompt_template_ + combine_prompt_template
 
 _myscale_prompt = """You are a MyScale expert. Given an input question, first create a syntactically correct MyScale query to run, then look at the results of the query and return the answer to the input question.
 MyScale queries has a vector distance function called `DISTANCE(column, array)` to compute relevance to the user's question and sort the feature array column by the relevance. 
