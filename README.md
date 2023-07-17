@@ -1,5 +1,5 @@
 # ChatData 🔍 📖
-***We are constantly improving LangChain's self-query retriever. Some of the features are not merged.***
+***We are constantly improving LangChain's self-query retriever. Some of the features are not merged yet.***
 
 [![](https://dcbadge.vercel.app/api/server/D2qpkqc4Jq?compact=true&style=flat)](https://discord.gg/D2qpkqc4Jq)
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/myscaledb.svg?style=social&label=Follow%20%40MyScaleDB)](https://twitter.com/myscaledb)
@@ -14,6 +14,8 @@ Yet another chat-with-documents app, but supporting query over millions of files
 
 ## News 🔥
 
+- 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
+- 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
 - 🔧 Our contribution to LangChain that helps self-query retrievers [**filter with more types and functions**](https://python.langchain.com/docs/modules/data_connection/retrievers/how_to/self_query/myscale_self_query)
 - 🌟 **We just opened a FREE pod hosting data for ArXiv paper.** Anyone can try their own SQL with vector search!!! Feel the power when SQL meets vector search! See how to access the pod [here](#data-service).
 - 📚 We collected about **2 million papers on arxiv**! We are collecting more and we need your advice!
