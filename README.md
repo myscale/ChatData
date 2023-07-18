@@ -32,7 +32,7 @@ source .venv/bin/activate
 
 2. Install dependencies
 
-> This app is currently using [MyScale's fork of LangChain](https://github.com/myscale/langchain/tree/master). 
+> This app is currently using [MyScale's technical preview of LangChain](https://github.com/myscale/langchain/tree/preview). 
 >> 
 >> It contains improved SQLDatabaseChain in [this PR](https://github.com/hwchase17/langchain/pull/7454)
 >> 
