@@ -12,7 +12,7 @@
 
 Yet another chat-with-documents app, but supporting query over millions of files with [MyScale](https://myscale.com) and [LangChain](https://github.com/hwchase17/langchain/).
 
-## News 🔥
+## News 🔥 (July-2023)
 
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
 - 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
@@ -32,7 +32,11 @@ source .venv/bin/activate
 
 2. Install dependencies
 
-> This app is currently using [MyScale's fork of LangChain](https://github.com/myscale/langchain/tree/master). It contains [improved prompts](https://github.com/hwchase17/langchain/pull/6737#discussion_r1243527112) for comparators `LIKE` and `CONTAIN` in [MyScale self-query retriever](https://github.com/hwchase17/langchain/pull/6143).
+> This app is currently using [MyScale's fork of LangChain](https://github.com/myscale/langchain/tree/master). 
+>> 
+>> It contains improved SQLDatabaseChain in [this PR](https://github.com/hwchase17/langchain/pull/7454)
+>> 
+>> It contains [improved prompts](https://github.com/hwchase17/langchain/pull/6737#discussion_r1243527112) for comparators `LIKE` and `CONTAIN` in [MyScale self-query retriever](https://github.com/hwchase17/langchain/pull/6143).
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -72,14 +76,7 @@ python3 -m streamlit run app.py
         password='myscale_rocks'
     )
     ```
-    You can simply put these settings in `.streamlit/secrets.toml` as well:
 
-    ```toml
-    MYSCALE_HOST = "msc-1decbcc9.us-east-1.aws.staging.myscale.cloud"
-    MYSCALE_PORT = 443
-    MYSCALE_USER = "chatdata"
-    MYSCALE_PASSWORD = "myscale_rocks"
-    ```
 
 ## Introduction
 
@@ -92,7 +89,7 @@ MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
 ```
 
-ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info (continuously updating), which contains:
+ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info, which contains:
 
 1. `id`: paper's arxiv id
 2. `abstract`: paper's abstracts used as ranking criterion (with InstructXL)
@@ -117,7 +114,7 @@ ChatData brings millions of papers into your knowledge base. We imported 2.2 mil
 
 And for overall table schema, please refer to [table creation section in docs/self-query.md](docs/self-query.md#table-creation).
 
-If you want to use this database with `langchain.chains.sql_database.base.SQLDatabaseChain` or `langchain.retrievers.SQLDatabaseRetriever`, please follow guides [on myscale.com](https://blog.myscale.cloud/2023/07/17/teach-your-llm-vector-sql/#create-the-sqldatabasechain)
+If you want to use this database with `langchain.chains.sql_database.base.SQLDatabaseChain` or `langchain.retrievers.SQLDatabaseRetriever`, please follow guides on [data preparation section](docs/vector-sql.md#prepare-the-database) and [chain creation section](docs/vector-sql.md#create-the-sqldatabasechain) in docs/vector-sql.md
 
 ## How to run 🏃
 <a name="how-to-run"></a>
@@ -127,13 +124,15 @@ python3 -m pip install requirements.txt
 python3 -m streamlit run app.py
 ```
 
-## How to build? 🧱
+## How to build from scratch? 🧱
 
-See [docs/self-query.md](docs/self-query.md)
+- with LangChain SQLDatabaseRetrievers: See [docs/vector-sql.md](docs/vector-sql.md)
+- with LangChain Self-Query Retrievers: See [docs/self-query.md](docs/self-query.md)
 
 ## Special Thanks 👏 (Ordered Alphabetically)
 
 - [ArXiv API](https://info.arxiv.org/help/api/index.html) for its open access interoperability to pre-printed papers.
 - [InstructorXL](https://huggingface.co/hkunlp/instructor-xl) for its promptable embeddings that improves retrieve performance.
 - [LangChain🦜️🔗](https://github.com/hwchase17/langchain/) for its easy-to-use and composable API designs and prompts.
+- [OpenChatPaper](https://github.com/liuyixin-louis/OpenChatPaper) for prompt design reference.
 - [The Alexandria Index](https://alex.macrocosm.so/download) for providing arXiv data index to the public.
