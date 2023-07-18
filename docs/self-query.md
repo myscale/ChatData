@@ -75,7 +75,7 @@ Great. Let’s move onto the next step.
 > We have appended additional metadata, like the publication date and authors, to each ArXiv entry.
 
 Our data is hosted on [Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html), supported by [Clickhouse table functions](https://clickhouse.com/docs/en/sql-reference/table-functions/s3).
-The compressed `jsonl` file is available [here](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/full.jsonl.zst). You can also import data from our AWS S3 bucket (the URL will look like `https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.*.jsonl.zst`) to your MyScale Cloud with [S3 table function](https://clickhouse.com/docs/en/sql-reference/table-functions/s3).
+The compressed `jsonl` file is available [here](https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/full.json.zst). You can also import data via partitioned dataset (113 parts) from our AWS S3 bucket (the URL will look like `https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.part*.0.jsonl.zst`) to your MyScale Cloud with [S3 table function](https://clickhouse.com/docs/en/sql-reference/table-functions/s3).
 
 > You can also upload the data onto Google Cloud Platform and use the same SQL insert query to import this data.
 
