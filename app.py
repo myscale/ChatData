@@ -1,16 +1,11 @@
-from embeddings.clip import HuggingfaceClipModel
-from prompts.unsplash_prompt import _DEFAULT_TEMPLATE
-from chains.arxiv_chains import ArXivQAwithSourcesChain, ArXivStuffDocumentChain
-from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
-    ChatDataSelfAskCallBackHandler, ChatDataSQLSearchCallBackHandler, \
-    ChatDataSQLAskCallBackHandler
-from prompts.arxiv_prompt import combine_prompt_template, _myscale_prompt
-from langchain.retrievers import SQLDatabaseChainRetriever
-from langchain.sql_database import SQLDatabase
+from os import environ
+import streamlit as st
+import datetime
+environ['TOKENIZERS_PARALLELISM'] = 'true'
+environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
+
+import pandas as pd
 from langchain.chains import LLMChain
-from langchain.chains.sql_database.parser import \
-    VectorSQLRetrieveAllOutputParser, VectorSQLOutputParser
-from langchain.chains.sql_database.base import SQLDatabaseChain
 from sqlalchemy import create_engine, MetaData
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, \
     SystemMessagePromptTemplate, HumanMessagePromptTemplate
@@ -21,13 +16,22 @@ from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.vectorstores import MyScale, MyScaleSettings
-import pandas as pd
-from os import environ
-import streamlit as st
-import datetime
-environ['TOKENIZERS_PARALLELISM'] = 'true'
-environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
+# langchain experimental packages
+from langchain_experimental.sql.base import SQLDatabaseChain
+from langchain_experimental.utilities.sql_database import SQLDatabase
+from langchain_experimental.retrievers.sql_database import SQLDatabaseChainRetriever
+from langchain_experimental.sql.parser import \
+    VectorSQLRetrieveAllOutputParser, VectorSQLOutputParser
+
+# local packages
+from embeddings.clip import HuggingfaceClipModel
+from prompts.unsplash_prompt import _DEFAULT_TEMPLATE
+from chains.arxiv_chains import ArXivQAwithSourcesChain, ArXivStuffDocumentChain
+from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
+    ChatDataSelfAskCallBackHandler, ChatDataSQLSearchCallBackHandler, \
+    ChatDataSQLAskCallBackHandler
+from prompts.arxiv_prompt import combine_prompt_template, _myscale_prompt
 
 st.set_page_config(page_title="ChatData")
 
@@ -59,9 +63,9 @@ def try_eval(x):
 
 
 def display(dataframe, columns=None, index=None):
-    if index:
-        dataframe.set_index(index)
     if len(dataframe) > 0:
+        if index:
+            dataframe.set_index(index)
         if columns:
             st.dataframe(dataframe[columns])
         else:
