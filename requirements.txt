@@ -1,4 +1,5 @@
-langchain @ git+https://github.com/myscale/langchain.git@preview
+langchain @ git+https://github.com/myscale/langchain.git@preview#egg=langchain&subdirectory=libs/langchain
+langchain-experimental @ git+https://github.com/myscale/langchain.git@preview#egg=langchain-experimental&subdirectory=libs/experimental
 InstructorEmbedding
 pandas
 sentence_transformers
