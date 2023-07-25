@@ -17,11 +17,12 @@ from langchain.prompts.prompt import PromptTemplate
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, \
     SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from sqlalchemy import create_engine, MetaData
-from langchain.chains.sql_database.base import SQLDatabaseChain
-from langchain.chains.sql_database.parser import VectorSQLRetrieveAllOutputParser
 from langchain.chains import LLMChain
-from langchain.sql_database import SQLDatabase
-from langchain.retrievers import SQLDatabaseChainRetriever
+
+from langchain_experimental.utilities.sql_database import SQLDatabase
+from langchain_experimental.sql.base import SQLDatabaseChain
+from langchain_experimental.sql.parser import VectorSQLRetrieveAllOutputParser
+from langchain_experimental.retrievers.sql_database import SQLDatabaseChainRetriever
 
 from chains.arxiv_chains import ArXivQAwithSourcesChain, ArXivStuffDocumentChain
 from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
@@ -44,9 +45,9 @@ def try_eval(x):
 
 
 def display(dataframe, columns=None, index=None):
-    if index:
-        dataframe.set_index(index)
     if len(dataframe) > 0:
+        if index:
+            dataframe.set_index(index)
         if columns:
             st.dataframe(dataframe[columns])
         else:
