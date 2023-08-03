@@ -126,17 +126,21 @@ python3 -m streamlit run app.py
 
 ### With LangChain SQLDatabaseRetrievers
 
- See [docs/vector-sql.md](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
+ [*Read full article*](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
 
-- How can I run this app?
-- How this app is built?
-- What is the overview pipeline?
-- How did LangChain and MyScale convert natural language to structured filters?
-- How to make chain execution more responsive in LangChain?
+
+- [Why Vector SQL?](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/#automate-the-whole-process-with-sql-and-vector-search)
+- [How did LangChain and MyScale convert natural language to structured filters?](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+- [How to make chain execution more responsive in LangChain?](https://docs.myscale.com/en/advanced-applications/chatdata/#add-callbacks)
 
 ### With LangChain Self-Query Retrievers
 
-See [docs/self-query.md](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+[*Read full article*](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+
+- [How this app is built?](https://docs.myscale.com/en/advanced-applications/chatdata)
+- [What is the overview pipeline](https://docs.myscale.com/en/advanced-applications/chatdata/#design-the-query-pipeline)?
+- [How did LangChain and MyScale convert natural language to structured filters?](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+- [How to make chain execution more responsive in LangChain?](https://docs.myscale.com/en/advanced-applications/chatdata/#add-callbacks)
 
 ## Community 🌍
 
