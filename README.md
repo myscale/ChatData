@@ -12,7 +12,78 @@
 
 Yet another chat-with-documents app, but supporting query over millions of files with [MyScale](https://myscale.com) and [LangChain](https://github.com/hwchase17/langchain/).
 
-## News 🔥 (July-2023)
+## Introduction 📖
+
+### Overview
+
+ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
+
+With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
+
+Attention: if you want real-time insights on LK-99 but short on time to dive into numerous papers on arXiv, ChatData has got your back! 📖💡 Quickly access reliable information and references in just a few seconds, for example: "Please review the developments in room-temperature superconductor", then go find the answer by yourself 😉
+
+### Data schema
+
+Database credentials:
+
+```toml
+MYSCALE_HOST = "msc-1decbcc9.us-east-1.aws.staging.myscale.cloud"
+MYSCALE_PORT = 443
+MYSCALE_USER = "chatdata"
+MYSCALE_PASSWORD = "myscale_rocks"
+```
+
+ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info, which contains:
+
+1. `id`: paper's arxiv id
+2. `abstract`: paper's abstracts used as ranking criterion (with InstructXL)
+3. `vector`: column that contains the vector array in `Array(Float32)`
+4. `metadata`: LangChain VectorStore Compatible Columns
+    1. `metadata.authors`: paper's authors in *list of strings*
+    2. `metadata.abstract`: paper's abstracts used as ranking criterion (with InstructXL)
+    3. `metadata.titles`: papers's titles
+    4. `metadata.categories`: paper's categories in *list of strings* like ["cs.CV"]
+    5. `metadata.pubdate`: paper's date of publication in *ISO 8601 formated strings*
+    6. `metadata.primary_category`: paper's primary category in *strings* defined by arXiv
+    7. `metadata.comment`: some additional comment to the paper
+  
+*Columns below are native columns in MyScale and can only be used as SQLDatabase*
+
+5. `authors`: paper's authors in *list of strings*
+6. `titles`: papers's titles
+7. `categories`: paper's categories in *list of strings* like ["cs.CV"]
+8. `pubdate`: paper's date of publication in *Date32 data type* (faster)
+9. `primary_category`: paper's primary category in *strings* defined by arXiv
+10. `comment`: some additional comment to the paper
+
+And for overall table schema, please refer to [table creation section in docs/self-query.md](docs/self-query.md#table-creation).
+
+If you want to use this database with `langchain.chains.sql_database.base.SQLDatabaseChain` or `langchain.retrievers.SQLDatabaseRetriever`, please follow guides on [data preparation section](docs/vector-sql.md#prepare-the-database) and [chain creation section](docs/vector-sql.md#create-the-sqldatabasechain) in docs/vector-sql.md
+
+### How to run ChatData
+
+<a name="how-to-run"></a>
+
+```bash
+python3 -m pip install requirements.txt
+python3 -m streamlit run app.py
+```
+
+### Where can I get those arXiv data?
+  - [From parquet files on S3](docs/self-query.md#insert-data)
+  - <a name="data-service"></a>Or Directly use MyScale database as service... for **FREE** ✨
+    ```python
+    import clickhouse_connect
+
+    client = clickhouse_connect.get_client(
+        host='msc-1decbcc9.us-east-1.aws.staging.myscale.cloud',
+        port=443,
+        username='chatdata',
+        password='myscale_rocks'
+    )
+    ```
+
+## Monthly Updates 🔥 (July-2023)
 
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
 - 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
@@ -21,7 +92,9 @@ Yet another chat-with-documents app, but supporting query over millions of files
 - 📚 We collected about **2 million papers on arxiv**! We are collecting more and we need your advice!
 - More coming...
 
-## Quickstart
+## How to build your own app from scratch 🧱
+
+### Quickstart
 
 1. Create an virtual environment
 
@@ -51,87 +124,28 @@ cp .streamlit/secrets.example.toml .streamlit/secrets.toml
 python3 -m streamlit run app.py
 ```
 
-## Quick Navigator 🧭
+### With LangChain SQLDatabaseRetrievers
 
-- [How can I run this app?](README.md#how-to-run)
+ See [docs/vector-sql.md](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
 
-- [How this app is built?](docs/self-query.md)
+- How can I run this app?
+- How this app is built?
+- What is the overview pipeline?
+- How did LangChain and MyScale convert natural language to structured filters?
+- How to make chain execution more responsive in LangChain?
 
-- [What is the overview pipeline?](docs/self-query.md#query-pipeline-design)
+### With LangChain Self-Query Retrievers
 
-- [How did LangChain and MyScale convert natural language to structured filters?](docs/self-query.md#selfqueryretriever-defines-interaction-between-vectorstore-and-your-app)
+See [docs/self-query.md](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
 
-- [How to make chain execution more responsive in LangChain?](docs/self-query.md#not-responsive-add-callbacks)
+## Community 🌍
 
-- Where can I get those arxiv data?
-  - [From parquet files on S3](docs/self-query.md#insert-data)
-  - <a name="data-service"></a>Or Directly use MyScale database as service... for **FREE** ✨
-    ```python
-    import clickhouse_connect
-
-    client = clickhouse_connect.get_client(
-        host='msc-1decbcc9.us-east-1.aws.staging.myscale.cloud',
-        port=443,
-        username='chatdata',
-        password='myscale_rocks'
-    )
-    ```
-
-
-## Introduction
-
-Database credentials:
-
-```toml
-MYSCALE_HOST = "msc-1decbcc9.us-east-1.aws.staging.myscale.cloud"
-MYSCALE_PORT = 443
-MYSCALE_USER = "chatdata"
-MYSCALE_PASSWORD = "myscale_rocks"
-```
-
-ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info, which contains:
-
-1. `id`: paper's arxiv id
-2. `abstract`: paper's abstracts used as ranking criterion (with InstructXL)
-3. `vector`: column that contains the vector array in `Array(Float32)`
-4. `metadata`: LangChain VectorStore Compatible Columns
-    1. `metadata.authors`: paper's authors in *list of strings*
-    2. `metadata.abstract`: paper's abstracts used as ranking criterion (with InstructXL)
-    3. `metadata.titles`: papers's titles
-    4. `metadata.categories`: paper's categories in *list of strings* like ["cs.CV"]
-    5. `metadata.pubdate`: paper's date of publication in *ISO 8601 formated strings*
-    6. `metadata.primary_category`: paper's primary category in *strings* defined by ArXiv
-    7. `metadata.comment`: some additional comment to the paper
-  
-*Columns below are native columns in MyScale and can only be used as SQLDatabase*
-
-5. `authors`: paper's authors in *list of strings*
-6. `titles`: papers's titles
-7. `categories`: paper's categories in *list of strings* like ["cs.CV"]
-8. `pubdate`: paper's date of publication in *Date32 data type* (faster)
-9. `primary_category`: paper's primary category in *strings* defined by ArXiv
-10. `comment`: some additional comment to the paper
-
-And for overall table schema, please refer to [table creation section in docs/self-query.md](docs/self-query.md#table-creation).
-
-If you want to use this database with `langchain.chains.sql_database.base.SQLDatabaseChain` or `langchain.retrievers.SQLDatabaseRetriever`, please follow guides on [data preparation section](docs/vector-sql.md#prepare-the-database) and [chain creation section](docs/vector-sql.md#create-the-sqldatabasechain) in docs/vector-sql.md
-
-## How to run 🏃
-<a name="how-to-run"></a>
-
-```bash
-python3 -m pip install requirements.txt
-python3 -m streamlit run app.py
-```
-
-## How to build from scratch? 🧱
-
-- with LangChain SQLDatabaseRetrievers: See [docs/vector-sql.md](docs/vector-sql.md)
-- with LangChain Self-Query Retrievers: See [docs/self-query.md](docs/self-query.md)
+- Welcome to join our #ChatData channel in [Discord](https://discord.gg/jGCq2yZH) to discuss anything about ChatData.
+- Feel free to filing an issue or opening a PR against this repository.
 
 ## Special Thanks 👏 (Ordered Alphabetically)
 
-- [ArXiv API](https://info.arxiv.org/help/api/index.html) for its open access interoperability to pre-printed papers.
+- [arXiv API](https://info.arxiv.org/help/api/index.html) for its open access interoperability to pre-printed papers.
 - [InstructorXL](https://huggingface.co/hkunlp/instructor-xl) for its promptable embeddings that improves retrieve performance.
 - [LangChain🦜️🔗](https://github.com/hwchase17/langchain/) for its easy-to-use and composable API designs and prompts.
 - [OpenChatPaper](https://github.com/liuyixin-louis/OpenChatPaper) for prompt design reference.
