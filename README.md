@@ -20,7 +20,9 @@ ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy
 
 With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
 
-Attention: if you want real-time insights on LK-99 but short on time to dive into numerous papers on arXiv, ChatData has got your back! 📖💡 Quickly access reliable information and references in just a few seconds, for example: "Please review the developments in room-temperature superconductor", then go find the answer by yourself 😉
+**Show you the case**: if you want real-time insights on LK-99 but short on time to dive into numerous papers on arXiv, ChatData has got your back! 📖💡 Quickly access reliable information and references in just a few seconds, for example, ask ChatData: "Is it possible to synthesize room temperature super conductive material? Please use researches after 2021"
+
+![](/assets/demo.gif)
 
 ### Data schema
 
@@ -126,7 +128,7 @@ python3 -m streamlit run app.py
 
 ### With LangChain SQLDatabaseRetrievers
 
- [*Read full article*](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
+ [*Read the full article*](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
 
 
 - [Why Vector SQL?](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/#automate-the-whole-process-with-sql-and-vector-search)
@@ -135,7 +137,7 @@ python3 -m streamlit run app.py
 
 ### With LangChain Self-Query Retrievers
 
-[*Read full article*](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+[*Read the full article*](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
 
 - [How this app is built?](https://docs.myscale.com/en/advanced-applications/chatdata)
 - [What is the overview pipeline](https://docs.myscale.com/en/advanced-applications/chatdata/#design-the-query-pipeline)?
