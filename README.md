@@ -140,7 +140,7 @@ python3 -m streamlit run app.py
 [*Read the full article*](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
 
 - [How this app is built?](https://docs.myscale.com/en/advanced-applications/chatdata)
-- [What is the overview pipeline](https://docs.myscale.com/en/advanced-applications/chatdata/#design-the-query-pipeline)?
+- [What is the overview pipeline?](https://docs.myscale.com/en/advanced-applications/chatdata/#design-the-query-pipeline)
 - [How did LangChain and MyScale convert natural language to structured filters?](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
 - [How to make chain execution more responsive in LangChain?](https://docs.myscale.com/en/advanced-applications/chatdata/#add-callbacks)
 
