@@ -15,6 +15,25 @@ from langchain.chains.qa_with_sources.retrieval import RetrievalQAWithSourcesCha
 from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 
+from langchain_experimental.sql.vector_sql import VectorSQLOutputParser
+
+
+class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
+    """Based on VectorSQLOutputParser
+    It also modify the SQL to get all columns
+    """
+
+    @property
+    def _type(self) -> str:
+        return "vector_sql_retrieve_custom"
+
+    def parse(self, text: str) -> Dict[str, Any]:
+        text = text.strip()
+        start = text.upper().find("SELECT")
+        if start >= 0:
+            end = text.upper().find("FROM")
+            text = text.replace(text[start + len("SELECT") + 1 : end - 1], "title, abstract, authors, pubdate, categories, id")
+        return super().parse(text)
 
 class ArXivStuffDocumentChain(StuffDocumentsChain):
     """Combine arxiv documents with PDF reference number"""
