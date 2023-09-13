@@ -2,6 +2,7 @@ import streamlit as st
 from typing import Dict, Any
 from sql_formatter.core import format_sql
 from langchain.callbacks.streamlit.streamlit_callback_handler import StreamlitCallbackHandler
+from langchain.schema.output import LLMResult
 
 class ChatDataSelfSearchCallBackHandler(StreamlitCallbackHandler):
     def __init__(self) -> None:
@@ -62,8 +63,14 @@ class ChatDataSQLSearchCallBackHandler(StreamlitCallbackHandler):
     def on_llm_start(self, serialized, prompts, **kwargs) -> None:
         pass
         
-    def on_text(self, text: str, **kwargs) -> None:
-        if text.startswith('SELECT'):
+    def on_llm_end(
+        self,
+        response: LLMResult,
+        *args,
+        **kwargs,
+    ):
+        text = response.generations[0][0].text
+        if text.replace(' ', '').upper().startswith('SELECT'):
             st.write('We generated Vector SQL for you:')
             st.markdown(f'''```sql\n{format_sql(text, max_len=80)}\n```''')
             print(f"Vector SQL: {text}")
