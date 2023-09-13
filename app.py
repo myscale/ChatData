@@ -9,7 +9,7 @@ environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 from langchain.vectorstores import MyScale, MyScaleSettings
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.chains.query_constructor.base import AttributeInfo
+from langchain.chains.query_constructor.base import AttributeInfo, VirtualColumnName
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
 
@@ -19,22 +19,21 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, \
 from sqlalchemy import create_engine, MetaData
 from langchain.chains import LLMChain
 
-from langchain_experimental.utilities.sql_database import SQLDatabase
-from langchain_experimental.sql.base import SQLDatabaseChain
-from langchain_experimental.sql.parser import VectorSQLRetrieveAllOutputParser
-from langchain_experimental.retrievers.sql_database import SQLDatabaseChainRetriever
+from langchain.utilities.sql_database import SQLDatabase
+from langchain_experimental.retrievers.vector_sql_database import VectorSQLDatabaseChainRetriever
+from langchain_experimental.sql.vector_sql import VectorSQLDatabaseChain
 
+from chains.arxiv_chains import VectorSQLRetrieveCustomOutputParser
 from chains.arxiv_chains import ArXivQAwithSourcesChain, ArXivStuffDocumentChain
 from callbacks.arxiv_callbacks import ChatDataSelfSearchCallBackHandler, \
     ChatDataSelfAskCallBackHandler, ChatDataSQLSearchCallBackHandler, \
     ChatDataSQLAskCallBackHandler
 from prompts.arxiv_prompt import combine_prompt_template, _myscale_prompt
 
+
 st.set_page_config(page_title="ChatData")
 
 st.header("ChatData")
-
-columns = ['ref_id', 'title', 'id', 'categories', 'abstract', 'authors', 'pubdate']
 
 
 def try_eval(x):
@@ -44,12 +43,12 @@ def try_eval(x):
         return x
 
 
-def display(dataframe, columns=None, index=None):
+def display(dataframe, columns_=None, index=None):
     if len(dataframe) > 0:
         if index:
             dataframe.set_index(index)
-        if columns:
-            st.dataframe(dataframe[columns])
+        if columns_:
+            st.dataframe(dataframe[columns_])
         else:
             st.dataframe(dataframe)
     else:
@@ -83,7 +82,7 @@ def build_retriever():
     with st.spinner("Building Self Query Retriever..."):
         metadata_field_info = [
             AttributeInfo(
-                name="pubdate",
+                name=VirtualColumnName(name="pubdate"),
                 description="The year the paper is published",
                 type="timestamp",
             ),
@@ -154,9 +153,9 @@ def build_retriever():
             template=_myscale_prompt,
         )
 
-        output_parser = VectorSQLRetrieveAllOutputParser.from_embeddings(
+        output_parser = VectorSQLRetrieveCustomOutputParser.from_embeddings(
             model=embeddings)
-        sql_query_chain = SQLDatabaseChain.from_llm(
+        sql_query_chain = VectorSQLDatabaseChain.from_llm(
             llm=OpenAI(openai_api_key=OPENAI_API_KEY, temperature=0),
             prompt=PROMPT,
             top_k=10,
@@ -165,7 +164,7 @@ def build_retriever():
             sql_cmd_parser=output_parser,
             native_format=True
         )
-        sql_retriever = SQLDatabaseChainRetriever(
+        sql_retriever = VectorSQLDatabaseChainRetriever(
             sql_db_chain=sql_query_chain, page_content_key="abstract")
 
     with st.spinner('Building QA Chain with Vector SQL...'):
@@ -185,7 +184,8 @@ def build_retriever():
             max_tokens_limit=12000,
         )
 
-    return [{'name': m.name, 'desc': m.description, 'type': m.type} for m in metadata_field_info], retriever, chain, sql_retriever, sql_chain
+    return [{'name': m.name.name if type(m.name) is VirtualColumnName else m.name, 'desc': m.description, 'type': m.type} for m in metadata_field_info], \
+        retriever, chain, sql_retriever, sql_chain
 
 
 if 'retriever' not in st.session_state:
@@ -204,7 +204,8 @@ st.info("We provides you metadata columns below for query. Please choose a natur
         "- Did Geoffrey Hinton wrote paper about Capsule Neural Networks?\n"
         "- Introduce some applications of GANs published around 2019.\n"
         "- 请根据 2019 年左右的文章介绍一下 GAN 的应用都有哪些\n"
-        "- Veuillez présenter les applications du GAN sur la base des articles autour de 2019 ?")
+        "- Veuillez présenter les applications du GAN sur la base des articles autour de 2019 ?\n"
+        "- Is it possible to synthesize room temperature super conductive material?")
 tab_sql, tab_self_query = st.tabs(['Vector SQL', 'Self-Query Retrievers'])
 with tab_sql:
     st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.", icon='💡')
@@ -259,7 +260,7 @@ ENGINE = ReplacingMergeTree ORDER BY id
                     f"### Answer from LLM\n{ret['answer']}\n### References")
                 docs = ret['sources']
                 docs = pd.DataFrame([{**d.metadata, 'abstract': d.page_content} for d in docs])
-                display(docs, columns, index='ref_id')
+                display(docs, ['ref_id', 'title', 'id', 'categories', 'abstract', 'authors', 'pubdate'], index='ref_id')
             except Exception as e:
                 st.write('Oops 😵 Something bad happened...')
                 raise e
@@ -286,7 +287,7 @@ with tab_self_query:
                 docs = pd.DataFrame(
                     [{**d.metadata, 'abstract': d.page_content} for d in docs])
 
-                display(docs, columns)
+                display(docs, ['title', 'id', 'categories', 'abstract', 'authors', 'pubdate'])
             except Exception as e:
                 st.write('Oops 😵 Something bad happened...')
                 raise e
@@ -305,7 +306,7 @@ with tab_self_query:
                     f"### Answer from LLM\n{ret['answer']}\n### References")
                 docs = ret['sources']
                 docs = pd.DataFrame([{**d.metadata, 'abstract': d.page_content} for d in docs])
-                display(docs, columns, index='ref_id')
+                display(docs, ['title', 'id', 'categories', 'abstract', 'authors', 'pubdate'], index='ref_id')
             except Exception as e:
                 st.write('Oops 😵 Something bad happened...')
                 raise e
