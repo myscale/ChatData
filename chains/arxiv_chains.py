@@ -1,4 +1,4 @@
-import re
+import logging
 import inspect
 from typing import Dict, Any, Optional, List, Tuple
 
@@ -7,21 +7,62 @@ from langchain.callbacks.manager import (
     AsyncCallbackManagerForChainRun,
     CallbackManagerForChainRun,
 )
+from langchain.embeddings.base import Embeddings
 from langchain.schema import BaseRetriever
 from langchain.callbacks.manager import Callbacks
 from langchain.schema.prompt_template import format_document
 from langchain.docstore.document import Document
 from langchain.chains.qa_with_sources.retrieval import RetrievalQAWithSourcesChain
-from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
+from langchain.vectorstores.myscale import MyScale, MyScaleSettings
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 
 from langchain_experimental.sql.vector_sql import VectorSQLOutputParser
 
+logger = logging.getLogger()
+
+class MyScaleWithoutMetadataJson(MyScale):
+    def __init__(self, embedding: Embeddings, config: Optional[MyScaleSettings] = None, must_have_cols: List[str] = [], **kwargs: Any) -> None:
+        super().__init__(embedding, config, **kwargs)
+        self.must_have_cols: List[str] = must_have_cols
+        
+    def _build_qstr(
+        self, q_emb: List[float], topk: int, where_str: Optional[str] = None
+    ) -> str:
+        q_emb_str = ",".join(map(str, q_emb))
+        if where_str:
+            where_str = f"PREWHERE {where_str}"
+        else:
+            where_str = ""
+
+        q_str = f"""
+            SELECT {self.config.column_map['text']}, dist, {','.join(self.must_have_cols)}
+            FROM {self.config.database}.{self.config.table}
+            {where_str}
+            ORDER BY distance({self.config.column_map['vector']}, [{q_emb_str}]) 
+                AS dist {self.dist_order}
+            LIMIT {topk}
+            """
+        return q_str
+    
+    def similarity_search_by_vector(self, embedding: List[float], k: int = 4, where_str: Optional[str] = None, **kwargs: Any) -> List[Document]:
+        q_str = self._build_qstr(embedding, k, where_str)
+        try:
+            return [
+                Document(
+                    page_content=r[self.config.column_map["text"]],
+                    metadata={k: r[k] for k in self.must_have_cols},
+                )
+                for r in self.client.query(q_str).named_results()
+            ]
+        except Exception as e:
+            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            return []
 
 class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
     """Based on VectorSQLOutputParser
     It also modify the SQL to get all columns
     """
+    must_have_columns: List[str]
 
     @property
     def _type(self) -> str:
@@ -32,8 +73,9 @@ class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
         start = text.upper().find("SELECT")
         if start >= 0:
             end = text.upper().find("FROM")
-            text = text.replace(text[start + len("SELECT") + 1 : end - 1], "title, abstract, authors, pubdate, categories, id")
-        return super().parse(text)
+            text = text.replace(text[start + len("SELECT") + 1 : end - 1], ", ".join(self.must_have_columns))
+        sql = super().parse(text)
+        return sql
 
 class ArXivStuffDocumentChain(StuffDocumentsChain):
     """Combine arxiv documents with PDF reference number"""
@@ -123,12 +165,15 @@ class ArXivQAwithSourcesChain(RetrievalQAWithSourcesChain):
         ref_cnt = 1
         for d in docs:
             ref_id = d.metadata['ref_id']
-            if f"PDF #{ref_id}" in answer:
+            if f"Doc #{ref_id}" in answer:
+                answer = answer.replace(f"Doc #{ref_id}", f"#{ref_id}")
+            if f"#{ref_id}" in answer:
                 title = d.metadata['title'].replace('\n', '')
                 d.metadata['ref_id'] = ref_cnt
-                answer = answer.replace(f"PDF #{ref_id}", f"{title} [{ref_cnt}]")
+                answer = answer.replace(f"#{ref_id}", f"{title} [{ref_cnt}]")
                 sources.append(d)
                 ref_cnt += 1
+                
         
         result: Dict[str, Any] = {
             self.answer_key: answer,
