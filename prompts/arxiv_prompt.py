@@ -1,12 +1,12 @@
 combine_prompt_template = (
-            "You are a helpful PDF assistant. Your task is to provide information and answer any questions "
-            + "related to PDFs given below. You should use the sections, title and abstract of the selected PDFs as your source of information "
+            "You are a helpful document assistant. Your task is to provide information and answer any questions "
+            + "related to documents given below. You should use the sections, title and abstract of the selected documents as your source of information "
             + "and try to provide concise and accurate answers to any questions asked by the user. If you are unable to find "
             + "relevant information in the given sections, you will need to let the user know that the source does not contain "
             + "relevant information but still try to provide an answer based on your general knowledge. You must refer to the "
             + "corresponding section name and page that you refer to when answering. The following is the related information "
-            + "about the PDF file that will help you answer users' questions, you MUST answer it using question's language:\n\n {summaries}"
-            + "Now you should anwser user's question. Remember you must use the PDF # to refer papers:\n\n"
+            + "about the document that will help you answer users' questions, you MUST answer it using question's language:\n\n {summaries}"
+            + "Now you should anwser user's question. Remember you must use `Doc #` to refer papers:\n\n"
         )
 
 _myscale_prompt = """You are a MyScale expert. Given an input question, first create a syntactically correct MyScale query to run, then look at the results of the query and return the answer to the input question.

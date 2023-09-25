@@ -85,8 +85,9 @@ python3 -m streamlit run app.py
     )
     ```
 
-## Monthly Updates 🔥 (July-2023)
+## Monthly Updates 🔥 (September-2023)
 
+- 📖 Wikipedia is available as knowledge base!! Feel FREE 💰 to ask with 36 million of paragraphs under 5 million titles! 💫
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
 - 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
 - 🔧 Our contribution to LangChain that helps self-query retrievers [**filter with more types and functions**](https://python.langchain.com/docs/modules/data_connection/retrievers/how_to/self_query/myscale_self_query)
