@@ -14,42 +14,17 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, \
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain import OpenAI
-from langchain.chains.query_constructor.base import AttributeInfo, VirtualColumnName
-from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.retrievers.self_query.myscale import MyScaleTranslator
-from langchain.embeddings import HuggingFaceInstructEmbeddings, SentenceTransformerEmbeddings
-from langchain.vectorstores import MyScaleSettings
-from chains.arxiv_chains import MyScaleWithoutMetadataJson
 import re
 import pandas as pd
 from os import environ
 import streamlit as st
 import datetime
-from helper import build_all, sel_map
+from helper import build_all, sel_map, display
 environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
 st.set_page_config(page_title="ChatData")
 
 st.header("ChatData")
-
-
-def try_eval(x):
-    try:
-        return eval(x, {'datetime': datetime})
-    except:
-        return x
-
-
-def display(dataframe, columns_=None, index=None):
-    if len(dataframe) > 0:
-        if index:
-            dataframe.set_index(index)
-        if columns_:
-            st.dataframe(dataframe[columns_])
-        else:
-            st.dataframe(dataframe)
-    else:
-        st.write("Sorry 😵 we didn't find any articles related to your query.\n\nMaybe the LLM is too naughty that does not follow our instruction... \n\nPlease try again and use verbs that may match the datatype.", unsafe_allow_html=True)
 
 if 'retriever' not in st.session_state:
     st.session_state["sel_map_obj"] = build_all()
