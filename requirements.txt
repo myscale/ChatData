@@ -3,7 +3,7 @@ langchain-experimental @ git+https://github.com/myscale/langchain.git@preview#eg
 InstructorEmbedding
 pandas
 sentence_transformers
-streamlit==1.21
+streamlit==1.25
 altair==4.2.2
 clickhouse-connect
 openai

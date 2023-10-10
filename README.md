@@ -35,6 +35,40 @@ MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
 ```
 
+#### *[NEW]* Table `wiki.Wikipedia`
+
+ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowlegde base is a snapshot on 2022-12.
+
+You can query from this table with the public account [here](#data-schema).
+
+```sql
+CREATE TABLE wiki.Wikipedia (
+    -- Record ID
+    `id` String, 
+    -- Page title to this paragraph
+    `title` String, 
+    -- Paragraph text
+    `text` String,
+    -- Page URL
+    `url` String,
+    -- Wiki page ID
+    `wiki_id` UInt64,
+    -- View statistics
+    `views` Float32,
+    -- Paragraph ID
+    `paragraph_id` UInt64,
+    -- Language ID
+    `langs` UInt32, 
+    -- Feature vector to this paragraph
+    `emb` Array(Float32), 
+    -- Vector Index
+    VECTOR INDEX emb_idx emb TYPE MSTG('metric_type=Cosine'), 
+    CONSTRAINT emb_len CHECK length(emb) = 768) 
+ENGINE = ReplacingMergeTree ORDER BY id SETTINGS index_granularity = 8192
+```
+
+#### Table `default.ChatArXiv`
+
 ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info, which contains:
 
 1. `id`: paper's arxiv id
@@ -85,8 +119,9 @@ python3 -m streamlit run app.py
     )
     ```
 
-## Monthly Updates 🔥 (September-2023)
+## Monthly Updates 🔥 (October-2023)
 
+- 💬 Chat with RAG-enabled agents on both ArXiv and Wikipedia knowledge base!
 - 📖 Wikipedia is available as knowledge base!! Feel FREE 💰 to ask with 36 million of paragraphs under 5 million titles! 💫
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
 - 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
