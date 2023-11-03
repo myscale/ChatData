@@ -29,7 +29,7 @@ With ChatData, you can effortlessly navigate through vast amounts of data, effor
 Database credentials:
 
 ```toml
-MYSCALE_HOST = "msc-1decbcc9.us-east-1.aws.staging.myscale.cloud"
+MYSCALE_HOST = "msc-4a9e710a.us-east-1.aws.staging.myscale.cloud"
 MYSCALE_PORT = 443
 MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
@@ -78,7 +78,7 @@ python3 -m streamlit run app.py
     import clickhouse_connect
 
     client = clickhouse_connect.get_client(
-        host='msc-1decbcc9.us-east-1.aws.staging.myscale.cloud',
+        host='msc-4a9e710a.us-east-1.aws.staging.myscale.cloud',
         port=443,
         username='chatdata',
         password='myscale_rocks'
