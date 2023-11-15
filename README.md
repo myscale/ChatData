@@ -16,13 +16,11 @@ Yet another chat-with-documents app, but supporting query over millions of files
 
 ### Overview
 
-ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
+ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Utilizing the Retrieval Augmented Generation (RAG) framework, ChatData takes millions of wikipedia pages and arxiv papers as the external knowledge base with MyScale handling all the data hosting jobs. Now say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
 
 With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
 
-**Show you the case**: if you want real-time insights on LK-99 but short on time to dive into numerous papers on arXiv, ChatData has got your back! 📖💡 Quickly access reliable information and references in just a few seconds, for example, ask ChatData: "Is it possible to synthesize room temperature super conductive material? Please use researches after 2021"
-
-![](/assets/demo.gif)
+![](/assets/rag-enabled-chatdata.gif)
 
 ### Data schema
 
