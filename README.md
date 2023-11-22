@@ -20,7 +20,7 @@ ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy
 
 With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. **Also, the newly updated feature allows you to build up your own knowledge bases, which can be paired with our chat bot to extend the power of LLM!** Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
 
-![](/assets/rag-enabled-chatdata.gif)
+![](/assets/demo.gif)
 
 ### Data schema
 
