@@ -117,8 +117,9 @@ python3 -m streamlit run app.py
     )
     ```
 
-## Monthly Updates 🔥 (October-2023)
+## Monthly Updates 🔥 (November-2023)
 
+- 🚀 Upload your documents and chat with your own knowledge bases with MyScale!
 - 💬 Chat with RAG-enabled agents on both ArXiv and Wikipedia knowledge base!
 - 📖 Wikipedia is available as knowledge base!! Feel FREE 💰 to ask with 36 million of paragraphs under 5 million titles! 💫
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
