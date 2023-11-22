@@ -16,24 +16,56 @@ Yet another chat-with-documents app, but supporting query over millions of files
 
 ### Overview
 
-ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
+ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Utilizing the Retrieval Augmented Generation (RAG) framework, ChatData takes millions of wikipedia pages and arxiv papers as the external knowledge base with MyScale handling all the data hosting jobs. Now say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
 
 With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
 
-**Show you the case**: if you want real-time insights on LK-99 but short on time to dive into numerous papers on arXiv, ChatData has got your back! 📖💡 Quickly access reliable information and references in just a few seconds, for example, ask ChatData: "Is it possible to synthesize room temperature super conductive material? Please use researches after 2021"
-
-![](/assets/demo.gif)
+![](/assets/rag-enabled-chatdata.gif)
 
 ### Data schema
 
 Database credentials:
 
 ```toml
-MYSCALE_HOST = "msc-1decbcc9.us-east-1.aws.staging.myscale.cloud"
+MYSCALE_HOST = "msc-4a9e710a.us-east-1.aws.staging.myscale.cloud"
 MYSCALE_PORT = 443
 MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
 ```
+
+#### *[NEW]* Table `wiki.Wikipedia`
+
+ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowlegde base is a snapshot on 2022-12.
+
+You can query from this table with the public account [here](#data-schema).
+
+```sql
+CREATE TABLE wiki.Wikipedia (
+    -- Record ID
+    `id` String, 
+    -- Page title to this paragraph
+    `title` String, 
+    -- Paragraph text
+    `text` String,
+    -- Page URL
+    `url` String,
+    -- Wiki page ID
+    `wiki_id` UInt64,
+    -- View statistics
+    `views` Float32,
+    -- Paragraph ID
+    `paragraph_id` UInt64,
+    -- Language ID
+    `langs` UInt32, 
+    -- Feature vector to this paragraph
+    `emb` Array(Float32), 
+    -- Vector Index
+    VECTOR INDEX emb_idx emb TYPE MSTG('metric_type=Cosine'), 
+    CONSTRAINT emb_len CHECK length(emb) = 768) 
+ENGINE = ReplacingMergeTree ORDER BY id SETTINGS index_granularity = 8192
+```
+
+#### Table `default.ChatArXiv`
 
 ChatData brings millions of papers into your knowledge base. We imported 2.2 million papers with metadata info, which contains:
 
@@ -78,15 +110,16 @@ python3 -m streamlit run app.py
     import clickhouse_connect
 
     client = clickhouse_connect.get_client(
-        host='msc-1decbcc9.us-east-1.aws.staging.myscale.cloud',
+        host='msc-4a9e710a.us-east-1.aws.staging.myscale.cloud',
         port=443,
         username='chatdata',
         password='myscale_rocks'
     )
     ```
 
-## Monthly Updates 🔥 (September-2023)
+## Monthly Updates 🔥 (October-2023)
 
+- 💬 Chat with RAG-enabled agents on both ArXiv and Wikipedia knowledge base!
 - 📖 Wikipedia is available as knowledge base!! Feel FREE 💰 to ask with 36 million of paragraphs under 5 million titles! 💫
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
 - 🌏 Customized Retrieval QA Chain that gives you **more information** on each PDF and **answer question in your native language**!
