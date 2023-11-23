@@ -16,11 +16,31 @@ Yet another chat-with-documents app, but supporting query over millions of files
 
 ### Overview
 
-ChatData is a LLM-based chat app, which brings unmatched efficiency and accuracy to your document interactions. Utilizing the Retrieval Augmented Generation (RAG) framework, ChatData takes millions of wikipedia pages and arxiv papers as the external knowledge base with MyScale handling all the data hosting jobs. Now say goodbye to cumbersome keyword searches and hello to a seamless experience with powerful metadata filters and advanced vector search capabilities. 
+ChatData is a robust chat-with-documents application designed to extract information and provide answers by querying the MyScalefree knowledge base or your uploaded documents.
 
-With ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
+Powered by the Retrieval Augmented Generation (RAG) framework, ChatData leverages millions of Wikipedia pages and arXiv papers as its external knowledge base, with MyScale managing all data hosting tasks. Simply input your questions in natural language, and ChatData takes care of generating SQL, querying the data, and presenting the results.
 
-![](/assets/rag-enabled-chatdata.gif)
+Enhancing your chat experience, ChatData introduces three key features. Let's delve into each of them in detail.
+
+#### Feature 1: Retriever Type
+
+**Self-querying retriever:**
+
+**VectorSQL:** SQL is powerful and can be used to construct complex search queries. Vector Structured Query Language (Vector SQL) is designed to teach LLMs how to query SQL vector databases. Besides the general data types and functions, vectorSQL contains extra functions like DISTANCE(column, query_vector)and NeuralArray(entity), with which we can extend the standard SQL for vector search.
+
+#### Feature 2: Session Management
+
+To enhance your experience and seamlessly continue interactions with existing sessions, ChatData has introduced the Session Management feature. You can easily customize your session ID and modify your prompt to guide ChatData in addressing your queries. With just a few clicks, you can enjoy smooth and personalized session interactions.
+
+#### Feature 3: Building Your Own Knowledge Base
+
+In addition to tapping into ChatData's external knowledge base powered by MyScale for answers, you also have the option to upload your own files and establish a personalized knowledge base. We've implemented the Unstructured API for this purpose, ensuring that only processed texts from your documents are stored, prioritizing your data privacy.
+
+In conclusion, with ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips. 
+
+➡️ Dive in and experience ChatData on [Hugging Face](https://huggingface.co/spaces/myscale/ChatData)🤗
+
+![ChatData Homepage](../assets/chatdata-homepage.png)
 
 ### Data schema
 
