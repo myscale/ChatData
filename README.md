@@ -24,7 +24,7 @@ Enhancing your chat experience, ChatData introduces three key features. Let's de
 
 #### Feature 1: Retriever Type
 
-MyScale works closely with LangChain, providing you the easiest interface to build complex queries with LLM.
+MyScale works closely with LangChain, providing the easiest interface to build complex queries with LLM.
 
 **Self-querying retriever:** MyScale augmented LangChain's Self Querying Retriever, where the LLM can use more data types, for instance timestamps and array of strings, to build filters for the query.
 
