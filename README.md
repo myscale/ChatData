@@ -24,7 +24,9 @@ Enhancing your chat experience, ChatData introduces three key features. Let's de
 
 #### Feature 1: Retriever Type
 
-**Self-querying retriever:**
+MyScale works closely with LangChain, providing you the easiest interface to build complex queries with LLM.
+
+**Self-querying retriever:** MyScale augmented LangChain's Self Querying Retriever, where the LLM can use more data types, for instance timestamps and array of strings, to build filters for the query.
 
 **VectorSQL:** SQL is powerful and can be used to construct complex search queries. Vector Structured Query Language (Vector SQL) is designed to teach LLMs how to query SQL vector databases. Besides the general data types and functions, vectorSQL contains extra functions like DISTANCE(column, query_vector)and NeuralArray(entity), with which we can extend the standard SQL for vector search.
 
