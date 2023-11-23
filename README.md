@@ -35,7 +35,7 @@ MYSCALE_PASSWORD = "myscale_rocks"
 
 #### *[NEW]* Table `wiki.Wikipedia`
 
-ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowlegde base is a snapshot on 2022-12.
+ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowledge base is a snapshot on 2022-12.
 
 You can query from this table with the public account [here](#data-schema).
 
