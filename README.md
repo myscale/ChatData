@@ -16,7 +16,7 @@ Yet another chat-with-documents app, but supporting query over millions of files
 
 ### Overview
 
-ChatData is a robust chat-with-documents application designed to extract information and provide answers by querying the MyScalefree knowledge base or your uploaded documents.
+ChatData is a robust chat-with-documents application designed to extract information and provide answers by querying the MyScale free knowledge base or your uploaded documents.
 
 Powered by the Retrieval Augmented Generation (RAG) framework, ChatData leverages millions of Wikipedia pages and arXiv papers as its external knowledge base, with MyScale managing all data hosting tasks. Simply input your questions in natural language, and ChatData takes care of generating SQL, querying the data, and presenting the results.
 
