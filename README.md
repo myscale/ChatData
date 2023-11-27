@@ -24,7 +24,9 @@ Enhancing your chat experience, ChatData introduces three key features. Let's de
 
 #### Feature 1: Retriever Type
 
-**Self-querying retriever:**
+MyScale works closely with LangChain, providing the easiest interface to build complex queries with LLM.
+
+**Self-querying retriever:** MyScale augmented LangChain's Self Querying Retriever, where the LLM can use more data types, for instance timestamps and array of strings, to build filters for the query.
 
 **VectorSQL:** SQL is powerful and can be used to construct complex search queries. Vector Structured Query Language (Vector SQL) is designed to teach LLMs how to query SQL vector databases. Besides the general data types and functions, vectorSQL contains extra functions like DISTANCE(column, query_vector)and NeuralArray(entity), with which we can extend the standard SQL for vector search.
 
@@ -55,7 +57,7 @@ MYSCALE_PASSWORD = "myscale_rocks"
 
 #### *[NEW]* Table `wiki.Wikipedia`
 
-ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowlegde base is a snapshot on 2022-12.
+ChatData also provides you access to Wikipedia, a large knowledge base that contains about 36 million paragraphs under 5 million wiki pages. The knowledge base is a snapshot on 2022-12.
 
 You can query from this table with the public account [here](#data-schema).
 
@@ -137,8 +139,9 @@ python3 -m streamlit run app.py
     )
     ```
 
-## Monthly Updates 🔥 (October-2023)
+## Monthly Updates 🔥 (November-2023)
 
+- 🚀 Upload your documents and chat with your own knowledge bases with MyScale!
 - 💬 Chat with RAG-enabled agents on both ArXiv and Wikipedia knowledge base!
 - 📖 Wikipedia is available as knowledge base!! Feel FREE 💰 to ask with 36 million of paragraphs under 5 million titles! 💫
 - 🤖 LLMs are now capable of writing **Vector SQL** - a extended SQL with vector search! Vector SQL allows you to **access MyScale faster and stronger**! This will **be added to LangChain** soon! ([PR 7454](https://github.com/hwchase17/langchain/pull/7454))
