@@ -42,7 +42,7 @@ In conclusion, with ChatData, you can effortlessly navigate through vast amounts
 
 ➡️ Dive in and experience ChatData on [Hugging Face](https://huggingface.co/spaces/myscale/ChatData)🤗
 
-![ChatData Homepage](../assets/chatdata-homepage.png)
+![ChatData Homepage](assets/chatdata-homepage.png)
 
 ### Data schema
 
