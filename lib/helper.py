@@ -59,7 +59,7 @@ environ['TOKENIZERS_PARALLELISM'] = 'true'
 environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
 # query_model_name = "gpt-3.5-turbo-instruct"
-query_model_name = "text-davinci-003"
+query_model_name = "gpt-3.5-turbo-instruct"
 chat_model_name = "gpt-3.5-turbo-16k"
 
 

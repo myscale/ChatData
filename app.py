@@ -1,3 +1,5 @@
+import json
+import time
 import pandas as pd
 from os import environ
 import streamlit as st
@@ -15,6 +17,15 @@ from lib.helper import build_tools, build_all, sel_map, display
 environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
 st.set_page_config(page_title="ChatData", page_icon="https://myscale.com/favicon.ico")
+st.markdown(
+    f"""
+    <style>
+        .st-e4 {{
+            max-width: 500px
+        }}
+    </style>""",
+    unsafe_allow_html=True,
+)
 st.header("ChatData")
 
 if 'sel_map_obj' not in st.session_state or 'embeddings' not in st.session_state:

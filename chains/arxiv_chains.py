@@ -74,8 +74,7 @@ class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
         if start >= 0:
             end = text.upper().find("FROM")
             text = text.replace(text[start + len("SELECT") + 1 : end - 1], ", ".join(self.must_have_columns))
-        sql = super().parse(text)
-        return sql
+        return super().parse(text)
 
 class ArXivStuffDocumentChain(StuffDocumentsChain):
     """Combine arxiv documents with PDF reference number"""
