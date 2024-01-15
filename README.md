@@ -1,4 +1,5 @@
 # ChatData 🔍 📖
+
 ***We are constantly improving LangChain's self-query retriever. Some of the features are not merged yet.***
 
 [![](https://dcbadge.vercel.app/api/server/D2qpkqc4Jq?compact=true&style=flat)](https://discord.gg/D2qpkqc4Jq)
@@ -38,7 +39,7 @@ To enhance your experience and seamlessly continue interactions with existing se
 
 In addition to tapping into ChatData's external knowledge base powered by MyScale for answers, you also have the option to upload your own files and establish a personalized knowledge base. We've implemented the Unstructured API for this purpose, ensuring that only processed texts from your documents are stored, prioritizing your data privacy.
 
-In conclusion, with ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips. 
+In conclusion, with ChatData, you can effortlessly navigate through vast amounts of data, effortlessly accessing precisely what you need. Whether you're a researcher, a student, or a knowledge enthusiast, ChatData empowers you to explore academic papers and research documents like never before. Unlock the true potential of information retrieval with ChatData and discover a world of knowledge at your fingertips.
 
 ➡️ Dive in and experience ChatData on [Hugging Face](https://huggingface.co/spaces/myscale/ChatData)🤗
 
@@ -126,8 +127,10 @@ python3 -m streamlit run app.py
 ```
 
 ### Where can I get those arXiv data?
-  - [From parquet files on S3](docs/self-query.md#insert-data)
-  - <a name="data-service"></a>Or Directly use MyScale database as service... for **FREE** ✨
+
+- [From parquet files on S3](docs/self-query.md#insert-data)
+- <a name="data-service"></a>Or Directly use MyScale database as service... for **FREE** ✨
+
     ```python
     import clickhouse_connect
 
@@ -155,26 +158,32 @@ python3 -m streamlit run app.py
 
 ### Quickstart
 
-1. Create an virtual environment
+1. Enter directory `app/`
+
+```bash
+cd app/
+```
+
+2. Create an virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-2. Install dependencies
+3. Install dependencies
 
-> This app is currently using [MyScale's technical preview of LangChain](https://github.com/myscale/langchain/tree/preview). 
->> 
+> This app is currently using [MyScale's technical preview of LangChain](https://github.com/myscale/langchain/tree/preview).
+>
 >> It contains improved SQLDatabaseChain in [this PR](https://github.com/hwchase17/langchain/pull/7454)
->> 
+>>
 >> It contains [improved prompts](https://github.com/hwchase17/langchain/pull/6737#discussion_r1243527112) for comparators `LIKE` and `CONTAIN` in [MyScale self-query retriever](https://github.com/hwchase17/langchain/pull/6143).
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-3. Run the app!
+4. Run the app!
 
 ```python
 # fill you OpenAI key in .streamlit/secrets.toml
@@ -186,7 +195,6 @@ python3 -m streamlit run app.py
 ### With LangChain SQLDatabaseRetrievers
 
  [*Read the full article*](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
-
 
 - [Why Vector SQL?](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/#automate-the-whole-process-with-sql-and-vector-search)
 - [How did LangChain and MyScale convert natural language to structured filters?](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
