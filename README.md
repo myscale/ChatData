@@ -194,15 +194,15 @@ python3 -m streamlit run app.py
 
 ### With LangChain SQLDatabaseRetrievers
 
- [*Read the full article*](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/)
+ [*Read the full article*](https://myscale.com/blog/teach-your-llm-vector-sql/)
 
-- [Why Vector SQL?](https://blog.myscale.com/2023/07/17/teach-your-llm-vector-sql/#automate-the-whole-process-with-sql-and-vector-search)
-- [How did LangChain and MyScale convert natural language to structured filters?](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
-- [How to make chain execution more responsive in LangChain?](https://docs.myscale.com/en/advanced-applications/chatdata/#add-callbacks)
+- [Why Vector SQL?](https://myscale.com/blog/teach-your-llm-vector-sql/#automate-the-whole-process-with-sql-and-vector-search)
+- [How did LangChain and MyScale convert natural language to structured filters?](https://myscale.com/docs/en/advanced-applications/chatdata/#selfqueryretriever)
+- [How to make chain execution more responsive in LangChain?](https://myscale.com/docs/en/advanced-applications/chatdata/#add-callbacks)
 
 ### With LangChain Self-Query Retrievers
 
-[*Read the full article*](https://docs.myscale.com/en/advanced-applications/chatdata/#selfqueryretriever)
+[*Read the full article*](https://myscale.com/docs/en/advanced-applications/chatdata/)
 
 - [How this app is built?](https://docs.myscale.com/en/advanced-applications/chatdata)
 - [What is the overview pipeline?](https://docs.myscale.com/en/advanced-applications/chatdata/#design-the-query-pipeline)
