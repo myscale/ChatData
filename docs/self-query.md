@@ -24,13 +24,13 @@ But before we start, let’s look at the following diagrammatic workflow of the 
 <img src="../assets/chatapp-workflow.png" width=60%>
 </div>
 
-> Even though we describe how to develop this LLM-based chat app, we have a sample app on [GitHub](https://github.com/myscale/ChatData), including access to a [read-only vector database](../.streamlit/secrets.example.toml), further simplifying the app-creation process.
+> Even though we describe how to develop this LLM-based chat app, we have a sample app on [GitHub](https://github.com/myscale/ChatData), including access to a [read-only vector database](../app/.streamlit/secrets.example.toml), further simplifying the app-creation process.
 
 ## Prepare the Data
 
 As described in this image, the first step is to prepare the data.
 
-> We recommend you to use our open database for this app. The credentials are in the example configuration: `.streamlit/secrets.toml`. Or you can follow the instruction below to create your own database.  It takes about 20 minutes to create the database.
+> We recommend you to use our open database for this app. The credentials are in the example configuration: `$PROJECT_DIR/app/.streamlit/secrets.toml`. Or you can follow the instruction below to create your own database.  It takes about 20 minutes to create the database.
 
 We have sourced our data: a usable list of abstracts and arXiv IDs from the Alexandria Index through the [Macrocosm website](https://alex.macrocosm.so/). Using this data and interrogating the arXiv Open API, we can significantly enhance the query experience by retrieving a much richer set of metadata, including year, subject, release date, category, and author.
 
@@ -91,7 +91,7 @@ SELECT
   *
 FROM
   s3(
-    'https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.*.jsonl.zstd',
+    'https://myscale-demo.s3.ap-southeast-1.amazonaws.com/chat_arxiv/data.*.jsonl.zst',
     'JSONEachRow',
     'abstract String, id String, vector Array(Float32), metadata Object(''JSON'')',
     'zstd'
@@ -99,6 +99,7 @@ FROM
 ```
 
 Then you need to build the vector index with this SQL:
+
 ```sql
 ALTER TABLE langchain ADD VECTOR INDEX vec_idx vector TYPE MSTG('metric_type=Cosine')
 ```
@@ -110,7 +111,7 @@ The second option is to insert the data into the table using LangChain for bette
 Add the following code snippet to your app’s code:
 
 ```python
-# ! unzstd data-*.jsonl.zstd
+# ! unzstd data-*.jsonl.zst
 import json
 from langchain.docstore.document import Document
 
@@ -176,7 +177,7 @@ In the prompt filter context, MyScale includes more powerful and flexible filter
 
 > We contributed to LangChain's Self-Query retrievers to make them more powerful, resulting in self-query retrievers that provide more freedom to the LLM when designing the query.
 
-Look at [what else MyScale can do with metadata filters](https://blog.myscale.com/2023/06/06/why-integrated-database-solution-can-boost-your-llm-apps/#filter-on-anything-without-constraints).
+Look at [what else MyScale can do with metadata filters](https://myscale.com/blog/why-integrated-database-solution-can-boost-your-llm-apps/#filter-on-anything-without-constraints).
 
 Here is the code for it, written using LangChain:
 

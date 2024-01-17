@@ -1,4 +1,4 @@
-# Teach Your LLM to Seach Using Vector SQL and Answer With Facts From Database
+# Teach Your LLM to Search Using Vector SQL and Answer With Facts From Database
 
 A vector database that supports Structured Query Language can store more than vectors. Common data types like timestamps and arrays can be accessed and filtered within the database, which improves the accuracy and efficiency of vector search queries. Accurate results from the database can teach LLMs to speak with facts, which reduces hallucination and enhance the quality and credibility of answers from LLM.
 
@@ -6,43 +6,43 @@ A vector database that supports Structured Query Language can store more than ve
 
 Large Language Models are advanced AI systems that can answer a wide range of questions. Although they provide informative responses on topics they know, they are not always accurate on unfamiliar topics. This phenomenon is known as **hallucination**.
 
-Before we look at an example of an LLM hallucination, let's consider a definition of the term "hallucination" as described by [Wikipedia.com](https://en.wikipedia.org/wiki/Hallucination): 
+Before we look at an example of an LLM hallucination, let's consider a definition of the term "hallucination" as described by [Wikipedia.com](https://en.wikipedia.org/wiki/Hallucination):
 
 > "A hallucination is a perception in the absence of an external stimulus that has the qualities of a real perception."
 
-Moreover: 
+Moreover:
 
 > "Hallucinations are vivid, substantial, and are perceived to be located in external objective space."
 
-In other words, a hallucination is an error in (or a false) perception of something real or concrete. For example, a Large Language Model was asked what LLM hallucinations are, with the answer being: 
+In other words, a hallucination is an error in (or a false) perception of something real or concrete. For example, a Large Language Model was asked what LLM hallucinations are, with the answer being:
 
 ![LLM Hallucinations. source: [aruna-x](https://dev.to/aruna/how-to-minimize-llm-hallucinations-2el7)](../assets/hallucination.png)
 
-Therefore, the question begs, how do we improve on (or fix) this result? The concise answer is to add facts to your question, such as providing the LLM definition before or after you ask the question. 
+Therefore, the question begs, how do we improve on (or fix) this result? The concise answer is to add facts to your question, such as providing the LLM definition before or after you ask the question.
 
-For instance: 
+For instance:
 
->  An LLM is a Large Language Model, an artificial neural network that models how humans talk and write. Please tell me, what is LLM hallucination?
+> An LLM is a Large Language Model, an artificial neural network that models how humans talk and write. Please tell me, what is LLM hallucination?
 
-The public domain answer to this question, provided by ChatGPT, is: 
+The public domain answer to this question, provided by ChatGPT, is:
 
 ![ChatGPT LLM Hallucinations Response](../assets/chatgpt-hallucination-response.png)
 
 **Note:** The reason for the first sentence, "Apologies for the confusion in my earlier response," is that we asked ChatGPT our first question, what LLM hallucinations are, before giving it our second prompt: "An LLM..."
 
-These additions have improved the quality of the answer. At least it no longer thinks an LLM hallucination is a "Late-Life Migraine Accompaniment!" 😆 
+These additions have improved the quality of the answer. At least it no longer thinks an LLM hallucination is a "Late-Life Migraine Accompaniment!" 😆
 
 ## External Knowledge Reduces Hallucinations
 
 At this juncture, it is absolutely crucial to note that an LLM is not infallible nor the ultimate authority on all knowledge. LLMs are trained on large amounts of data and learn patterns in language, but they may not always have access to the most up-to-date information or have a comprehensive understanding of complex topics.
 
-What now? How do you increase the chance of reducing LLM hallucinations? 
+What now? How do you increase the chance of reducing LLM hallucinations?
 
 The solution to this problem is to include supporting documents to the query (or prompt) to guide the LLM toward a more accurate and informed response. Like humans, it needs to learn from these documents to answer your question accurately and correctly.
 
 Helpful documents can come from many sources, including a search engine like Google or Bing and a digital library like Arxiv, among others, providing an interface to search for relevant passages. Using a database is also a good choice, providing a more flexible and private query interface.
 
-Knowledge retrieved from sources must be relevant to the question/prompt. There are several ways to retrieve relevant documents, including: 
+Knowledge retrieved from sources must be relevant to the question/prompt. There are several ways to retrieve relevant documents, including:
 
 * **Keyword-based:** Searching for keywords in plain text, suitable for an exact match on terms.
 * **Vector search-based:** Searching for records closer to embeddings, helpful in searching for appropriate paraphrases or general documents.
@@ -55,11 +55,11 @@ The LLM should also learn to query data from its data sources before answering t
 
 ![Vector Pipeline](../assets/pipeline.png)
 
-SQL is powerful and can be used to construct complex search queries. It supports many different data types and functions. And it allows us to write a vector search in SQL with `ORDER BY` and `LIMIT`, treating the similarity score between embeddings as a column `distance`. Pretty straightforward, isn't it? 
+SQL is powerful and can be used to construct complex search queries. It supports many different data types and functions. And it allows us to write a vector search in SQL with `ORDER BY` and `LIMIT`, treating the similarity score between embeddings as a column `distance`. Pretty straightforward, isn't it?
 
 > See the next section, [What Vector SQL Looks Like](#what-vector-sql-looks-like), for more information on structuring a vector SQL query.
 
-There are significant benefits to using vector SQL to build complex search queries, including: 
+There are significant benefits to using vector SQL to build complex search queries, including:
 
 * Increased flexibility for data type and function support
 * Improved efficiency because SQL is highly optimized and executed inside the database
@@ -68,7 +68,7 @@ There are significant benefits to using vector SQL to build complex search queri
 
 **Note:** Many SQL examples and tutorials are available on the Internet. LLMs are familiar with standard SQL as well as some of its dialects.
 
-Apart from MyScale, many SQL database solutions like Clickhouse and PostgreSQL are adding vector search to their existing functionality, allowing users to use vector SQL and LLMs to answer questions on complex topics. Similarly, an increasing number of application developers are starting to integrate vector searches with SQL into their applications. 
+Apart from MyScale, many SQL database solutions like Clickhouse and PostgreSQL are adding vector search to their existing functionality, allowing users to use vector SQL and LLMs to answer questions on complex topics. Similarly, an increasing number of application developers are starting to integrate vector searches with SQL into their applications.
 
 ## What Vector SQL Looks Like
 
@@ -85,12 +85,12 @@ ORDER BY DISTANCE(vector, NeuralArray(flower))
 LIMIT 10
 ```
 
-The `DISTANCE` function comprises the following: 
+The `DISTANCE` function comprises the following:
 
-* The inner function, `NeuralArray(flower)`, converts the word `flower` into an embedding. 
-* This embedding is then serialized and injected into the `DISTANCE` function. 
+* The inner function, `NeuralArray(flower)`, converts the word `flower` into an embedding.
+* This embedding is then serialized and injected into the `DISTANCE` function.
 
-Vector SQL is an extended version of SQL that needs further translation based on the vector database used. For instance, many implementations have different names for the `DISTANCE` function. It is called `distance` in MyScale, and `L2Distance` or `CosineDistance` in Clickhouse. Additionally, based on the database, this function name will be translated differently. 
+Vector SQL is an extended version of SQL that needs further translation based on the vector database used. For instance, many implementations have different names for the `DISTANCE` function. It is called `distance` in MyScale, and `L2Distance` or `CosineDistance` in Clickhouse. Additionally, based on the database, this function name will be translated differently.
 
 ## How to teach an LLM to write Vector SQL
 
@@ -104,7 +104,7 @@ First, we need to teach our LLM what standard vector SQL is. We aim to ensure th
 * Decide which column to use to perform the similarity search. It should always choose a vector column for similarity.
 * Translate the rest of our question's constraints into valid SQL.
 
-### 1. Design the LLM Prompt
+### 2. Design the LLM Prompt
 
 Having determined exactly what information the LLM requires to construct a vector SQL query, we can design the prompt as follows:
 
@@ -126,14 +126,14 @@ This prompt should do its job. But the more examples you add, the better it will
 ```sql
 ------ table schema ------
 CREATE TABLE "ChatPaper" (
-	abstract String, 
-	id String, 
-	vector Array(Float32), 
+ abstract String, 
+ id String, 
+ vector Array(Float32), 
         categories Array(String), 
-	pubdate DateTime, 
-	title String, 
-	authors Array(String), 
-	primary_category String
+ pubdate DateTime, 
+ title String, 
+ authors Array(String), 
+ primary_category String
 ) ENGINE = ReplicatedReplacingMergeTree()
  ORDER BY id
  PRIMARY KEY id
@@ -146,7 +146,7 @@ Question: What is PaperRank? What is the contribution of these works? Use papers
 SQLQuery: SELECT ChatPaper.title, ChatPaper.id, ChatPaper.authors FROM ChatPaper WHERE length(categories) > 2 ORDER BY DISTANCE(vector, NeuralArray(PaperRank contribution)) LIMIT {top_k}
 ```
 
-The more relevant examples you add to your prompt, the more the LLM's process of building the correct vector SQL query will improve. 
+The more relevant examples you add to your prompt, the more the LLM's process of building the correct vector SQL query will improve.
 
 Lastly, here are several extra tips to help you when designing your prompt:
 
@@ -157,13 +157,13 @@ Lastly, here are several extra tips to help you when designing your prompt:
 
 ## A Real-World Example: Using MyScale
 
-Let's now build [**a real-world example**](https://huggingface.co/spaces/myscale/ChatData), set out in the following steps: 
+Let's now build [**a real-world example**](https://huggingface.co/spaces/myscale/ChatData), set out in the following steps:
 
 ![A Real-World Example: Using MyScale](../assets/myscale-example.png)
 
 ### Prepare the Database
 
-We have prepared a playground for you with more than 2 million papers ready to query. You can access this data by adding the following Python code to your app. 
+We have prepared a playground for you with more than 2 million papers ready to query. You can access this data by adding the following Python code to your app.
 
 ```python
 from sqlalchemy import create_engine
@@ -175,7 +175,7 @@ MYSCALE_PASSWORD = "myscale_rocks"
 engine = create_engine(f'clickhouse://{MYSCALE_USER}:{MYSCALE_PASSWORD}@{MYSCALE_HOST}:{MYSCALE_PORT}/default?protocol=https')
 ```
 
-If you like, you can skip the following steps, where we create the table and insert its data using the MyScale console, and jump to where we play with vector SQL and [create the `SQLDatabaseChain`](#create-sqldatabasechain) to query the database. 
+If you like, you can skip the following steps, where we create the table and insert its data using the MyScale console, and jump to where we play with vector SQL and [create the `SQLDatabaseChain`](#create-sqldatabasechain) to query the database.
 
 **Create the database table:**
 
@@ -228,7 +228,7 @@ source .venv/bin/activate
 pip3 install langchain@git+https://github.com/myscale/langchain.git@preview
 ```
 
-Once you have installed this feature, the next step is to use it to query the database, as the following Python code demonstrates: 
+Once you have installed this feature, the next step is to use it to query the database, as the following Python code demonstrates:
 
 ```python
 from sqlalchemy import create_engine
@@ -285,6 +285,7 @@ query_chain.run("Introduce some papers that uses Generative Adversarial Networks
 ### Ask with `RetrievalQAwithSourcesChain`
 
 You can also use this SQLDatabaseChain as a Retriever. You can plugin it in to some retrieval QA chains just like other retievers in LangChain.
+
 ```python
 from langchain.retrievers import SQLDatabaseChainRetriever
 from langchain.chains.qa_with_sources.map_reduce_prompt import combine_prompt_template
@@ -321,15 +322,15 @@ ask_chain("Introduce some papers that uses Generative Adversarial Networks publi
     callbacks=[StdOutCallbackHandler()])
 ```
 
-We also provide a live demo on [**huggingface**](https://huggingface.co/spaces/myscale/ChatData) and the code is available on [**GitHub**](https://github.com/myscale/ChatData)! We used [**a customized Retrieval QA chain**](https://github.com/myscale/ChatData/blob/main/chains/arxiv_chains.py) to maximize the performance our search and ask pipeline with LangChain! 
+We also provide a live demo on [**huggingface**](https://huggingface.co/spaces/myscale/ChatData) and the code is available on [**GitHub**](https://github.com/myscale/ChatData)! We used [**a customized Retrieval QA chain**](https://github.com/myscale/ChatData/blob/main/chains/arxiv_chains.py) to maximize the performance our search and ask pipeline with LangChain!
 
 ## In Conclusion
 
-In reality, most LLMs hallucinate. The most practical way to reduce its appearance is to add extra facts (external knowledge) to your question. External knowledge is crucial to improving the performance of LLM systems, allowing for the efficient and accurate retrieval of answers. Every word counts, and you don't want to waste your money on unused information that is retrieved by inaccurate queries. 
+In reality, most LLMs hallucinate. The most practical way to reduce its appearance is to add extra facts (external knowledge) to your question. External knowledge is crucial to improving the performance of LLM systems, allowing for the efficient and accurate retrieval of answers. Every word counts, and you don't want to waste your money on unused information that is retrieved by inaccurate queries.
 
-How? 
+How?
 
-Enter Vector SQL, allowing you to execute finely-grained vector searches to target and retrieve the required information. 
+Enter Vector SQL, allowing you to execute finely-grained vector searches to target and retrieve the required information.
 
 Vector SQL is powerful and easy to learn for humans and machines. You can use many data types and functions to create complex queries. LLMs also like vector SQL, as its training dataset includes many references.
 
