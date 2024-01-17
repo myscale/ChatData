@@ -52,7 +52,8 @@ def parse_files(api_key, user_id, files: List[UploadedFile]):
 
 def extract_embedding(embeddings: Embeddings, texts):
     if len(texts) > 0:
-        embs = embeddings.embed_documents([t["text"] for _, t in enumerate(texts)])
+        embs = embeddings.embed_documents(
+            [t["text"] for _, t in enumerate(texts)])
         for i, _ in enumerate(texts):
             texts[i]["vector"] = embs[i]
         return texts

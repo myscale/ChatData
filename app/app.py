@@ -1,5 +1,3 @@
-import json
-import time
 import pandas as pd
 from os import environ
 import streamlit as st
@@ -13,10 +11,10 @@ from login import login, back_to_main
 from lib.helper import build_tools, build_all, sel_map, display
 
 
-
 environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
-st.set_page_config(page_title="ChatData", page_icon="https://myscale.com/favicon.ico")
+st.set_page_config(page_title="ChatData",
+                   page_icon="https://myscale.com/favicon.ico")
 st.markdown(
     f"""
     <style>
@@ -36,11 +34,12 @@ if login():
     if "user_name" in st.session_state:
         chat_page()
     elif "jump_query_ask" in st.session_state and st.session_state.jump_query_ask:
-        
+
         sel = st.selectbox('Choose the knowledge base you want to ask with:',
-                        options=['ArXiv Papers', 'Wikipedia'])
+                           options=['ArXiv Papers', 'Wikipedia'])
         sel_map[sel]['hint']()
-        tab_sql, tab_self_query = st.tabs(['Vector SQL', 'Self-Query Retrievers'])
+        tab_sql, tab_self_query = st.tabs(
+            ['Vector SQL', 'Self-Query Retrievers'])
         with tab_sql:
             sel_map[sel]['hint_sql']()
             st.text_input("Ask a question:", key='query_sql')
@@ -84,7 +83,6 @@ if login():
                     except Exception as e:
                         st.write('Oops 😵 Something bad happened...')
                         raise e
-
 
         with tab_self_query:
             st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.", icon='💡')

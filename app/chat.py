@@ -8,9 +8,6 @@ from lib.sessions import SessionManager
 from lib.private_kb import PrivateKnowledgeBase
 from langchain.schema import HumanMessage, FunctionMessage
 from callbacks.arxiv_callbacks import ChatDataAgentCallBackHandler
-from langchain.callbacks.streamlit.streamlit_callback_handler import (
-    StreamlitCallbackHandler,
-)
 from lib.json_conv import CustomJSONDecoder
 
 from lib.helper import (
@@ -313,7 +310,8 @@ def chat_page():
                     key="b_tool_files",
                     format_func=lambda x: x["file_name"],
                 )
-                st.text_input("Tool Name", "get_relevant_documents", key="b_tool_name")
+                st.text_input(
+                    "Tool Name", "get_relevant_documents", key="b_tool_name")
                 st.text_input(
                     "Tool Description",
                     "Searches among user's private files and returns related documents",
@@ -359,14 +357,16 @@ def chat_page():
                 )
                 st.markdown("### Uploaded Files")
                 st.dataframe(
-                    st.session_state.private_kb.list_files(st.session_state.user_name),
+                    st.session_state.private_kb.list_files(
+                        st.session_state.user_name),
                     use_container_width=True,
                 )
                 col_1, col_2 = st.columns(2)
                 with col_1:
                     st.button("Add Files", on_click=add_file)
                 with col_2:
-                    st.button("Clear Files and All Tools", on_click=clear_files)
+                    st.button("Clear Files and All Tools",
+                              on_click=clear_files)
 
         st.button("Clear Chat History", on_click=clear_history)
         st.button("Logout", on_click=back_to_main)

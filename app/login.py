@@ -1,21 +1,21 @@
-import json
-import time
-import pandas as pd
-from os import environ
 import streamlit as st
 from auth0_component import login_button
 
 AUTH0_CLIENT_ID = st.secrets['AUTH0_CLIENT_ID']
 AUTH0_DOMAIN = st.secrets['AUTH0_DOMAIN']
 
+
 def login():
     if "user_name" in st.session_state or ("jump_query_ask" in st.session_state and st.session_state.jump_query_ask):
         return True
-    st.subheader("🤗 Welcom to [MyScale](https://myscale.com)'s [ChatData](https://github.com/myscale/ChatData)! 🤗 ")
+    st.subheader(
+        "🤗 Welcom to [MyScale](https://myscale.com)'s [ChatData](https://github.com/myscale/ChatData)! 🤗 ")
     st.write("You can now chat with ArXiv and Wikipedia! 🌟\n")
     st.write("Built purely with streamlit 👑 , LangChain 🦜🔗 and love ❤️ for AI!")
-    st.write("Follow us on [Twitter](https://x.com/myscaledb) and [Discord](https://discord.gg/D2qpkqc4Jq)!")
-    st.write("For more details, please refer to [our repository on GitHub](https://github.com/myscale/ChatData)!")
+    st.write(
+        "Follow us on [Twitter](https://x.com/myscaledb) and [Discord](https://discord.gg/D2qpkqc4Jq)!")
+    st.write(
+        "For more details, please refer to [our repository on GitHub](https://github.com/myscale/ChatData)!")
     st.divider()
     col1, col2 = st.columns(2, gap='large')
     with col1.container():
@@ -33,7 +33,7 @@ def login():
     st.write("- [Privacy Policy](https://myscale.com/privacy/)\n"
              "- [Terms of Sevice](https://myscale.com/terms/)")
     if st.session_state.auth0 is not None:
-        st.session_state.user_info = dict(st.session_state.auth0) 
+        st.session_state.user_info = dict(st.session_state.auth0)
         if 'email' in st.session_state.user_info:
             email = st.session_state.user_info["email"]
         else:
@@ -43,6 +43,7 @@ def login():
         st.experimental_rerun()
     if st.session_state.jump_query_ask:
         st.experimental_rerun()
+
 
 def back_to_main():
     if "user_info" in st.session_state:

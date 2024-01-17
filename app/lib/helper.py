@@ -4,10 +4,8 @@ import time
 import hashlib
 from typing import Dict, Any, List, Tuple
 import re
-import pandas as pd
 from os import environ
 import streamlit as st
-import datetime
 from langchain.schema import BaseRetriever
 from langchain.tools import Tool
 from langchain.pydantic_v1 import BaseModel, Field
@@ -20,7 +18,7 @@ except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from clickhouse_sqlalchemy import (
-    Table, make_session, get_declarative_base, types, engines
+    types, engines
 )
 from langchain_experimental.sql.vector_sql import VectorSQLDatabaseChain
 from langchain_experimental.retrievers.vector_sql_database import VectorSQLDatabaseChainRetriever
@@ -43,12 +41,12 @@ from langchain.prompts.prompt import PromptTemplate
 from langchain.prompts.chat import MessagesPlaceholder
 from langchain.agents.openai_functions_agent.agent_token_buffer_memory import AgentTokenBufferMemory
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-from langchain.schema.messages import BaseMessage, HumanMessage, AIMessage, FunctionMessage,\
+from langchain.schema.messages import BaseMessage, HumanMessage, AIMessage, FunctionMessage, \
     SystemMessage, ChatMessage, ToolMessage
 from langchain.memory import SQLChatMessageHistory
 from langchain.memory.chat_message_histories.sql import \
-    BaseMessageConverter, DefaultMessageConverter
-from langchain.schema.messages import BaseMessage, _message_to_dict, messages_from_dict
+    DefaultMessageConverter
+from langchain.schema.messages import BaseMessage
 # from langchain.agents.agent_toolkits import create_retriever_tool
 from prompts.arxiv_prompt import combine_prompt_template, _myscale_prompt
 from chains.arxiv_chains import ArXivQAwithSourcesChain, ArXivStuffDocumentChain
@@ -73,13 +71,14 @@ UNSTRUCTURED_API = st.secrets['UNSTRUCTURED_API']
 
 COMBINE_PROMPT = ChatPromptTemplate.from_strings(
     string_messages=[(SystemMessagePromptTemplate, combine_prompt_template),
-                    (HumanMessagePromptTemplate, '{question}')])
+                     (HumanMessagePromptTemplate, '{question}')])
 DEFAULT_SYSTEM_PROMPT = (
     "Do your best to answer the questions. "
     "Feel free to use any tools available to look up "
     "relevant information. Please keep all details in query "
     "when calling search functions."
 )
+
 
 def hint_arxiv():
     st.info("We provides you metadata columns below for query. Please choose a natural expression to describe filters on those columns.\n\n"
@@ -150,7 +149,8 @@ sel_map = {
         "hint": hint_wiki,
         "hint_sql": hint_sql_wiki,
         "doc_prompt": PromptTemplate(
-            input_variables=["page_content", "url", "title", "ref_id", "views"],
+            input_variables=["page_content",
+                             "url", "title", "ref_id", "views"],
             template="Title for Doc #{ref_id}: {title}\n\tviews: {views}\n\tcontent: {page_content}\nSOURCE: {url}"),
         "metadata_cols": [
             AttributeInfo(
@@ -224,6 +224,7 @@ sel_map = {
     }
 }
 
+
 def build_embedding_model(_sel):
     """Build embedding model
     """
@@ -253,7 +254,8 @@ def build_chains_retrievers(_sel: str) -> Dict[str, Any]:
         "sql_retriever": sql_retriever,
         "sql_chain": sql_chain
     }
-    
+
+
 def build_self_query(_sel: str) -> SelfQueryRetriever:
     """Build self querying retriever
 
@@ -278,18 +280,20 @@ def build_self_query(_sel: str) -> SelfQueryRetriever:
                                      "vector": sel_map[_sel]["vector_col"],
                                      "metadata": sel_map[_sel]["metadata_col"]
                                  })
-        doc_search = MyScaleWithoutMetadataJson(st.session_state[f"emb_model_{_sel}"], config, 
+        doc_search = MyScaleWithoutMetadataJson(st.session_state[f"emb_model_{_sel}"], config,
                                                 must_have_cols=sel_map[_sel]['must_have_cols'])
 
     with st.spinner(f"Building Self Query Retriever for {_sel}..."):
         metadata_field_info = sel_map[_sel]["metadata_cols"]
         retriever = SelfQueryRetriever.from_llm(
-            OpenAI(model_name=query_model_name, openai_api_key=OPENAI_API_KEY, temperature=0),
+            OpenAI(model_name=query_model_name,
+                   openai_api_key=OPENAI_API_KEY, temperature=0),
             doc_search, "Scientific papers indexes with abstracts. All in English.", metadata_field_info,
             use_original_query=False, structured_query_translator=MyScaleTranslator())
     return retriever
 
-def build_vector_sql(_sel: str)->VectorSQLDatabaseChainRetriever:
+
+def build_vector_sql(_sel: str) -> VectorSQLDatabaseChainRetriever:
     """Build Vector SQL Database Retriever
 
     :param _sel: selected knowledge base
@@ -308,7 +312,8 @@ def build_vector_sql(_sel: str)->VectorSQLDatabaseChainRetriever:
         output_parser = VectorSQLRetrieveCustomOutputParser.from_embeddings(
             model=st.session_state[f'emb_model_{_sel}'], must_have_columns=sel_map[_sel]["must_have_cols"])
         sql_query_chain = VectorSQLDatabaseChain.from_llm(
-            llm=OpenAI(model_name=query_model_name, openai_api_key=OPENAI_API_KEY, temperature=0),
+            llm=OpenAI(model_name=query_model_name,
+                       openai_api_key=OPENAI_API_KEY, temperature=0),
             prompt=PROMPT,
             top_k=10,
             return_direct=True,
@@ -319,8 +324,9 @@ def build_vector_sql(_sel: str)->VectorSQLDatabaseChainRetriever:
         sql_retriever = VectorSQLDatabaseChainRetriever(
             sql_db_chain=sql_query_chain, page_content_key=sel_map[_sel]["text_col"])
     return sql_retriever
-    
-def build_qa_chain(_sel: str, retriever: BaseRetriever, name: str="Self-query") -> ArXivQAwithSourcesChain:
+
+
+def build_qa_chain(_sel: str, retriever: BaseRetriever, name: str = "Self-query") -> ArXivQAwithSourcesChain:
     """_summary_
 
     :param _sel: selected knowledge base
@@ -350,6 +356,7 @@ def build_qa_chain(_sel: str, retriever: BaseRetriever, name: str="Self-query") 
         )
     return chain
 
+
 @st.cache_resource
 def build_all() -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """build all resources
@@ -364,6 +371,7 @@ def build_all() -> Tuple[Dict[str, Any], Dict[str, Any]]:
         st.session_state[f'emb_model_{k}'] = embeddings[k]
         sel_map_obj[k] = build_chains_retrievers(k)
     return sel_map_obj, embeddings
+
 
 def create_message_model(table_name, DynamicBase):  # type: ignore
     """
@@ -397,6 +405,7 @@ def create_message_model(table_name, DynamicBase):  # type: ignore
 
     return Message
 
+
 def _message_from_dict(message: dict) -> BaseMessage:
     _type = message["type"]
     if _type == "human":
@@ -417,6 +426,7 @@ def _message_from_dict(message: dict) -> BaseMessage:
     else:
         raise ValueError(f"Got unexpected message type: {_type}")
 
+
 class DefaultClickhouseMessageConverter(DefaultMessageConverter):
     """The default message converter for SQLChatMessageHistory."""
 
@@ -425,27 +435,28 @@ class DefaultClickhouseMessageConverter(DefaultMessageConverter):
 
     def to_sql_model(self, message: BaseMessage, session_id: str) -> Any:
         tstamp = time.time()
-        msg_id = hashlib.sha256(f"{session_id}_{message}_{tstamp}".encode('utf-8')).hexdigest()
+        msg_id = hashlib.sha256(
+            f"{session_id}_{message}_{tstamp}".encode('utf-8')).hexdigest()
         user_id, _ = session_id.split("?")
         return self.model_class(
-            id=tstamp, 
+            id=tstamp,
             msg_id=msg_id,
             user_id=user_id,
-            session_id=session_id, 
+            session_id=session_id,
             type=message.type,
             addtionals=json.dumps(message.additional_kwargs),
             message=json.dumps({
-                "type": message.type, 
+                "type": message.type,
                 "additional_kwargs": {"timestamp": tstamp},
                 "data": message.dict()})
         )
-        
+
     def from_sql_model(self, sql_message: Any) -> BaseMessage:
         msg_dump = json.loads(sql_message.message)
         msg = _message_from_dict(msg_dump)
         msg.additional_kwargs = msg_dump["additional_kwargs"]
         return msg
-    
+
     def get_sql_model_class(self) -> Any:
         return self.model_class
 
@@ -458,7 +469,7 @@ def create_agent_executor(name, session_id, llm, tools, system_prompt, **kwargs)
         connection_string=f'{conn_str}/chat?protocol=https',
         custom_message_converter=DefaultClickhouseMessageConverter(name))
     memory = AgentTokenBufferMemory(llm=llm, chat_memory=chat_memory)
-    
+
     _system_message = SystemMessage(
         content=system_prompt
     )
@@ -475,9 +486,11 @@ def create_agent_executor(name, session_id, llm, tools, system_prompt, **kwargs)
         return_intermediate_steps=True,
         **kwargs
     )
-    
+
+
 class RetrieverInput(BaseModel):
     query: str = Field(description="query to look up in retriever")
+
 
 def create_retriever_tool(
     retriever: BaseRetriever, name: str, description: str
@@ -499,7 +512,7 @@ def create_retriever_tool(
             docs: List[Document] = func(*args, **kwargs)
             return json.dumps([d.dict() for d in docs], cls=CustomJSONEncoder)
         return wrapped_retrieve
-    
+
     return Tool(
         name=name,
         description=description,
@@ -507,7 +520,8 @@ def create_retriever_tool(
         coroutine=retriever.aget_relevant_documents,
         args_schema=RetrieverInput,
     )
-    
+
+
 @st.cache_resource
 def build_tools():
     """build all resources
@@ -531,8 +545,9 @@ def build_tools():
         })
     return sel_map_obj
 
+
 def build_agents(session_id, tool_names, chat_model_name=chat_model_name, temperature=0.6, system_prompt=DEFAULT_SYSTEM_PROMPT):
-    chat_llm = ChatOpenAI(model_name=chat_model_name, temperature=temperature, 
+    chat_llm = ChatOpenAI(model_name=chat_model_name, temperature=temperature,
                           openai_api_base=OPENAI_API_BASE, openai_api_key=OPENAI_API_KEY, streaming=True,
                           )
     tools = st.session_state.tools if "tools_with_users" not in st.session_state else st.session_state.tools_with_users
@@ -543,7 +558,7 @@ def build_agents(session_id, tool_names, chat_model_name=chat_model_name, temper
         chat_llm,
         tools=sel_tools,
         system_prompt=system_prompt
-        )
+    )
     return agent
 
 

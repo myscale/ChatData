@@ -8,7 +8,6 @@ from langchain.callbacks.streamlit.streamlit_callback_handler import (
     StreamlitCallbackHandler,
 )
 from langchain.schema.output import LLMResult
-from streamlit.delta_generator import DeltaGenerator
 
 
 class ChatDataSelfSearchCallBackHandler(StreamlitCallbackHandler):
@@ -26,7 +25,8 @@ class ChatDataSelfSearchCallBackHandler(StreamlitCallbackHandler):
         self.progress_bar.progress(value=0.6, text="Searching in DB...")
         if "repr" in outputs:
             st.markdown("### Generated Filter")
-            st.markdown(f"```python\n{outputs['repr']}\n```", unsafe_allow_html=True)
+            st.markdown(
+                f"```python\n{outputs['repr']}\n```", unsafe_allow_html=True)
 
     def on_chain_start(self, serialized, inputs, **kwargs) -> None:
         pass
@@ -88,7 +88,8 @@ class ChatDataSQLSearchCallBackHandler(StreamlitCallbackHandler):
             st.markdown(f"""```sql\n{format_sql(text, max_len=80)}\n```""")
             print(f"Vector SQL: {text}")
             self.prog_value += self.prog_interval
-            self.progress_bar.progress(value=self.prog_value, text="Searching in DB...")
+            self.progress_bar.progress(
+                value=self.prog_value, text="Searching in DB...")
 
     def on_chain_start(self, serialized, inputs, **kwargs) -> None:
         cid = ".".join(serialized["id"])

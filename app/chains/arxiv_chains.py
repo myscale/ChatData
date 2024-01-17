@@ -8,7 +8,6 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
 )
 from langchain.embeddings.base import Embeddings
-from langchain.schema import BaseRetriever
 from langchain.callbacks.manager import Callbacks
 from langchain.schema.prompt_template import format_document
 from langchain.docstore.document import Document
@@ -20,11 +19,12 @@ from langchain_experimental.sql.vector_sql import VectorSQLOutputParser
 
 logger = logging.getLogger()
 
+
 class MyScaleWithoutMetadataJson(MyScale):
     def __init__(self, embedding: Embeddings, config: Optional[MyScaleSettings] = None, must_have_cols: List[str] = [], **kwargs: Any) -> None:
         super().__init__(embedding, config, **kwargs)
         self.must_have_cols: List[str] = must_have_cols
-        
+
     def _build_qstr(
         self, q_emb: List[float], topk: int, where_str: Optional[str] = None
     ) -> str:
@@ -43,7 +43,7 @@ class MyScaleWithoutMetadataJson(MyScale):
             LIMIT {topk}
             """
         return q_str
-    
+
     def similarity_search_by_vector(self, embedding: List[float], k: int = 4, where_str: Optional[str] = None, **kwargs: Any) -> List[Document]:
         q_str = self._build_qstr(embedding, k, where_str)
         try:
@@ -55,8 +55,10 @@ class MyScaleWithoutMetadataJson(MyScale):
                 for r in self.client.query(q_str).named_results()
             ]
         except Exception as e:
-            logger.error(f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
+            logger.error(
+                f"\033[91m\033[1m{type(e)}\033[0m \033[95m{str(e)}\033[0m")
             return []
+
 
 class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
     """Based on VectorSQLOutputParser
@@ -73,8 +75,10 @@ class VectorSQLRetrieveCustomOutputParser(VectorSQLOutputParser):
         start = text.upper().find("SELECT")
         if start >= 0:
             end = text.upper().find("FROM")
-            text = text.replace(text[start + len("SELECT") + 1 : end - 1], ", ".join(self.must_have_columns))
+            text = text.replace(
+                text[start + len("SELECT") + 1: end - 1], ", ".join(self.must_have_columns))
         return super().parse(text)
+
 
 class ArXivStuffDocumentChain(StuffDocumentsChain):
     """Combine arxiv documents with PDF reference number"""
@@ -172,8 +176,7 @@ class ArXivQAwithSourcesChain(RetrievalQAWithSourcesChain):
                 answer = answer.replace(f"#{ref_id}", f"{title} [{ref_cnt}]")
                 sources.append(d)
                 ref_cnt += 1
-                
-        
+
         result: Dict[str, Any] = {
             self.answer_key: answer,
             self.sources_answer_key: sources,
