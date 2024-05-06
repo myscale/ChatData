@@ -56,9 +56,8 @@ from .json_conv import CustomJSONEncoder
 environ['TOKENIZERS_PARALLELISM'] = 'true'
 environ['OPENAI_API_BASE'] = st.secrets['OPENAI_API_BASE']
 
-# query_model_name = "gpt-3.5-turbo-instruct"
-query_model_name = "gpt-3.5-turbo-instruct"
-chat_model_name = "gpt-3.5-turbo-16k"
+query_model_name = "gpt-3.5-turbo-0125"
+chat_model_name = "gpt-3.5-turbo-0125"
 
 
 OPENAI_API_KEY = st.secrets['OPENAI_API_KEY']
