@@ -28,6 +28,7 @@ def login():
         st.write("Now with the power of LangChain's Conversantional Agents, we are able to build "
                  "an RAG-enabled chatbot within one MyScale instance! ")
         st.write("Log in to Chat with RAG!")
+        st.write("Recommended to use the standalone version of Chat-Data, available [here](https://myscale-chatdata.hf.space/).")
         login_button(AUTH0_CLIENT_ID, AUTH0_DOMAIN, "auth0")
     st.divider()
     st.write("- [Privacy Policy](https://myscale.com/privacy/)\n"
