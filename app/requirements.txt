@@ -9,7 +9,7 @@ streamlit==1.25
 streamlit-auth0-component
 altair==4.2.2
 clickhouse-connect
-openai
+openai==0.28.1
 lark
 tiktoken
 sql-formatter
