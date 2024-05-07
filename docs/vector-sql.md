@@ -167,7 +167,7 @@ We have prepared a playground for you with more than 2 million papers ready to q
 
 ```python
 from sqlalchemy import create_engine
-MYSCALE_HOST = "msc-4a9e710a.us-east-1.aws.staging.myscale.cloud"
+MYSCALE_HOST = "msc-950b9f1f.us-east-1.aws.myscale.com"
 MYSCALE_PORT = 443
 MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
@@ -232,7 +232,7 @@ Once you have installed this feature, the next step is to use it to query the da
 
 ```python
 from sqlalchemy import create_engine
-MYSCALE_HOST = "msc-4a9e710a.us-east-1.aws.staging.myscale.cloud"
+MYSCALE_HOST = "msc-950b9f1f.us-east-1.aws.myscale.com"
 MYSCALE_PORT = 443
 MYSCALE_USER = "chatdata"
 MYSCALE_PASSWORD = "myscale_rocks"
