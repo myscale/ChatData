@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+
 lib64/
 parts/
 sdist/
@@ -163,5 +163,5 @@ cython_debug/
 # dataset files
 data/
 .streamlit/
-*.ipynb
+#*.ipynb
 .DS_Store
