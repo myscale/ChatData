@@ -7,10 +7,10 @@ import streamlit as st
 from backend.constants.prompts import DEFAULT_SYSTEM_PROMPT
 from backend.constants.streamlit_keys import CHAT_KNOWLEDGE_TABLE, CHAT_SESSION_MANAGER, \
     CHAT_CURRENT_USER_SESSIONS, EL_SESSION_SELECTOR, USER_PRIVATE_FILES, \
-    CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR, \
-    CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME, CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION, \
-    USER_PRIVATE_KNOWLEDGE_BASES, AVAILABLE_RETRIEVAL_TOOLS, EL_PRIVATE_KB_NEEDS_REMOVE, \
-    EL_CREATE_KB_STATUS, EL_SELECTED_KBS, EL_UPLOAD_FILES
+    EL_BUILD_KB_WITH_FILES, \
+    EL_PERSONAL_KB_NAME, EL_PERSONAL_KB_DESCRIPTION, \
+    USER_PERSONAL_KNOWLEDGE_BASES, AVAILABLE_RETRIEVAL_TOOLS, EL_PERSONAL_KB_NEEDS_REMOVE, \
+    EL_UPLOAD_FILES_STATUS, EL_SELECTED_KBS, EL_UPLOAD_FILES
 from backend.constants.variables import USER_INFO, USER_NAME, JUMP_QUERY_ASK, RETRIEVER_TOOLS
 from backend.construct.build_agents import build_agents
 from backend.chat_bot.session_manager import SessionManager
@@ -81,10 +81,10 @@ def refresh_sessions():
         current_user_name
     )
     # load current user private knowledge bases.
-    st.session_state[USER_PRIVATE_KNOWLEDGE_BASES] = \
+    st.session_state[USER_PERSONAL_KNOWLEDGE_BASES] = \
         st.session_state[CHAT_KNOWLEDGE_TABLE].list_private_knowledge_bases(current_user_name)
     logger.info(f"current user name: {current_user_name}, "
-                f"user private knowledge bases: {st.session_state[USER_PRIVATE_KNOWLEDGE_BASES]}, "
+                f"user private knowledge bases: {st.session_state[USER_PERSONAL_KNOWLEDGE_BASES]}, "
                 f"user private files: {st.session_state[USER_PRIVATE_FILES]}")
     st.session_state[AVAILABLE_RETRIEVAL_TOOLS] = {
         # public retrieval tools
@@ -140,30 +140,30 @@ def create_private_knowledge_base_as_tool():
     current_user_name = st.session_state[USER_NAME]
 
     if (
-            CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME in st.session_state
-            and CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION in st.session_state
-            and CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR in st.session_state
-            and len(st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME]) > 0
-            and len(st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION]) > 0
-            and len(st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR]) > 0
+            EL_PERSONAL_KB_NAME in st.session_state
+            and EL_PERSONAL_KB_DESCRIPTION in st.session_state
+            and EL_BUILD_KB_WITH_FILES in st.session_state
+            and len(st.session_state[EL_PERSONAL_KB_NAME]) > 0
+            and len(st.session_state[EL_PERSONAL_KB_DESCRIPTION]) > 0
+            and len(st.session_state[EL_BUILD_KB_WITH_FILES]) > 0
     ):
         st.session_state[CHAT_KNOWLEDGE_TABLE].create_private_knowledge_base(
             user_id=current_user_name,
-            tool_name=st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME],
-            tool_description=st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION],
-            files=[f["file_name"] for f in st.session_state[CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR]],
+            tool_name=st.session_state[EL_PERSONAL_KB_NAME],
+            tool_description=st.session_state[EL_PERSONAL_KB_DESCRIPTION],
+            files=[f["file_name"] for f in st.session_state[EL_BUILD_KB_WITH_FILES]],
         )
         refresh_sessions()
     else:
-        st.session_state[EL_CREATE_KB_STATUS].error(
+        st.session_state[EL_UPLOAD_FILES_STATUS].error(
             "You should fill all fields to build up a tool!"
         )
         sleep(2)
 
 
 def remove_private_knowledge_bases():
-    if EL_PRIVATE_KB_NEEDS_REMOVE in st.session_state and st.session_state[EL_PRIVATE_KB_NEEDS_REMOVE]:
-        private_knowledge_bases_needs_remove = EL_PRIVATE_KB_NEEDS_REMOVE
+    if EL_PERSONAL_KB_NEEDS_REMOVE in st.session_state and st.session_state[EL_PERSONAL_KB_NEEDS_REMOVE]:
+        private_knowledge_bases_needs_remove = st.session_state[EL_PERSONAL_KB_NEEDS_REMOVE]
         private_knowledge_base_names = [item["tool_name"] for item in private_knowledge_bases_needs_remove]
         # remove these private knowledge bases.
         st.session_state[CHAT_KNOWLEDGE_TABLE].remove_private_knowledge_bases(
@@ -172,7 +172,7 @@ def remove_private_knowledge_bases():
         )
         refresh_sessions()
     else:
-        st.session_state[EL_CREATE_KB_STATUS].error(
+        st.session_state[EL_UPLOAD_FILES_STATUS].error(
             "You should specify at least one private knowledge base to delete!"
         )
         time.sleep(2)
@@ -187,10 +187,9 @@ def refresh_agent():
         if EL_SELECTED_KBS in st.session_state:
             selected_knowledge_bases = st.session_state[EL_SELECTED_KBS]
         else:
-            # TODO: 默认值要验证一下。
-            selected_knowledge_bases = ["LangChain Self Query Retriever For Wikipedia"]
+            selected_knowledge_bases = ["Wikipedia + Vector SQL"]
 
-        if "EL_SESSION_SELECTOR" in st.session_state:
+        if EL_SESSION_SELECTOR in st.session_state:
             system_prompt = st.session_state[EL_SESSION_SELECTOR]["system_prompt"]
         else:
             system_prompt = DEFAULT_SYSTEM_PROMPT
@@ -205,18 +204,18 @@ def refresh_agent():
 def add_file():
     user_name = st.session_state[USER_NAME]
     if EL_UPLOAD_FILES not in st.session_state or len(st.session_state[EL_UPLOAD_FILES]) == 0:
-        st.session_state[EL_CREATE_KB_STATUS].error("Please upload files!", icon="⚠️")
+        st.session_state[EL_UPLOAD_FILES_STATUS].error("Please upload files!", icon="⚠️")
         sleep(2)
         return
     try:
-        st.session_state[EL_CREATE_KB_STATUS].info("Uploading...")
+        st.session_state[EL_UPLOAD_FILES_STATUS].info("Uploading...")
         st.session_state[CHAT_KNOWLEDGE_TABLE].add_by_file(
             user_id=user_name,
             files=st.session_state[EL_UPLOAD_FILES]
         )
         refresh_sessions()
     except ValueError as e:
-        st.session_state[EL_CREATE_KB_STATUS].error("Failed to upload! " + str(e))
+        st.session_state[EL_UPLOAD_FILES_STATUS].error("Failed to upload! " + str(e))
         sleep(2)
 
 

@@ -130,9 +130,10 @@ class ChatBotKnowledgeTable:
         return [r for r in self.vector_store.client.query(query).named_results()]
 
     def remove_private_knowledge_bases(self, user_id: str, private_knowledge_bases: List[str]):
-        private_knowledge_bases = ",".join([f"'{t}'" for t in private_knowledge_bases])
+        unique_list = list(set(private_knowledge_bases))
+        unique_list = ",".join([f"'{t}'" for t in unique_list])
         query = f"""DELETE FROM {self.vector_store.config.database}.{self.private_knowledge_base_table}
-                    WHERE user_id  = '{user_id}' AND tool_name IN [{private_knowledge_bases}]"""
+                    WHERE user_id  = '{user_id}' AND tool_name IN [{unique_list}]"""
         self.vector_store.client.command(query)
 
     def as_retrieval_tools(self, user_id, tool_name=None):

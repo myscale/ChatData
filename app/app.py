@@ -9,9 +9,6 @@ from backend.constants.variables import DATA_INITIALIZE_STATUS, JUMP_QUERY_ASK, 
     TABLE_EMBEDDINGS_MAPPING, RETRIEVER_TOOLS, USER_NAME, GLOBAL_CONFIG, update_global_config
 from backend.construct.build_all import build_chains_and_retrievers, load_embedding_models, update_retriever_tools
 from backend.types.global_config import GlobalConfig
-# from chat import chat_page
-# from ui.home import render_home
-# from ui.retrievers import render_retrievers
 from logger import logger
 from ui.chat_page import chat_page
 from ui.home import render_home
@@ -29,6 +26,7 @@ def prepare_environment():
     os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
     os.environ["AUTH0_CLIENT_ID"] = st.secrets['AUTH0_CLIENT_ID']
     os.environ["AUTH0_DOMAIN"] = st.secrets['AUTH0_DOMAIN']
+    os.environ["AUTH0_CLIENT_SECRET"] = st.secrets['AUTH0_CLIENT_SECRET']
 
     update_global_config(GlobalConfig(
         openai_api_base=st.secrets['OPENAI_API_BASE'],
@@ -46,7 +44,7 @@ def prepare_environment():
     ))
 
 
-# 浏览器每次刷新时都会清空全部的 session keys
+# when refresh browser, all session keys will be cleaned.
 def initialize_session_state():
     if DATA_INITIALIZE_STATUS not in st.session_state:
         st.session_state[DATA_INITIALIZE_STATUS] = DATA_INITIALIZE_NOT_STATED
@@ -81,8 +79,6 @@ prepare_environment()
 initialize_session_state()
 initialize_chat_data()
 
-# st.session_state[USER_NAME] = USER_NAME
-st.session_state[USER_NAME] = "test"
 if USER_NAME in st.session_state:
     chat_page()
 else:

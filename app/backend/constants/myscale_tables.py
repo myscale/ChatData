@@ -8,23 +8,18 @@ from backend.types.table_config import TableConfig
 
 
 def hint_arxiv():
-    # st.info("We provides you metadata columns below for query. Please choose a natural expression to describe filters on those columns.\n\n"
-    #         "For example: \n\n"
-    #         "*If you want to search papers with complex filters*:\n\n"
-    #         "- What is a Bayesian network? Please use articles published later than Feb 2018 and with more than 2 categories and whose title like `computer` and must have `cs.CV` in its category.\n\n"
-    #         "*If you want to ask questions based on papers in database*:\n\n"
-    #         "- What is PageRank?\n"
-    #         "- Did Geoffrey Hinton wrote paper about Capsule Neural Networks?\n"
-    #         "- Introduce some applications of GANs published around 2019.\n"
-    #         "- 请根据 2019 年左右的文章介绍一下 GAN 的应用都有哪些\n"
-    #         "- Veuillez présenter les applications du GAN sur la base des articles autour de 2019 ?\n"
-    #         "- Is it possible to synthesize room temperature super conductive material?")
-    st.info("What is a Bayesian network? Please use articles published later than Feb 2018")
+    st.markdown("Here we provide some query samples.")
+    st.markdown("- If you want to search papers with filters")
+    st.markdown("1. ```What is a Bayesian network? Please use articles published later than Feb 2018 and with more "
+                "than 2 categories and whose title like `computer` and must have `cs.CV` in its category. ```")
+    st.markdown("2. ```What is a Bayesian network? Please use articles published later than Feb 2018```")
+    st.markdown("- If you want to ask questions based on arxiv papers stored in MyScaleDB")
+    st.markdown("1. ```Did Geoffrey Hinton wrote paper about Capsule Neural Networks?```")
+    st.markdown("2. ```Introduce some applications of GANs published around 2019.```")
+    st.markdown("3. ```请根据 2019 年左右的文章介绍一下 GAN 的应用都有哪些```")
 
 
 def hint_sql_arxiv():
-    st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.",
-            icon='💡')
     st.markdown('''```sql
 CREATE TABLE chatdata.ChatArXiv (
     `abstract` String, 
@@ -44,18 +39,16 @@ ENGINE = ReplacingMergeTree ORDER BY id
 
 
 def hint_wiki():
-    st.info(
-        "We provides you metadata columns below for query. Please choose a natural expression to describe filters on those columns.\n\n"
-        "For example: \n\n"
-        "- Which company did Elon Musk found?\n"
-        "- What is Iron Gwazi?\n"
-        "- What is a Ring in mathematics?\n"
-        "- 苹果的发源地是那里？\n")
+    st.markdown("Here we provide some query samples.")
+    st.markdown("1. ```Which company did Elon Musk found?```")
+    st.markdown("2. ```What is Iron Gwazi?```")
+    st.markdown("3. ```苹果的发源地是哪里？```")
+    st.markdown("4. ```What is a Ring in mathematics?```")
+    st.markdown("5. ```The producer of Rick and Morty.```")
+    st.markdown("6. ```How low is the temperature on Pluto?```")
 
 
 def hint_sql_wiki():
-    st.info("You can retrieve papers with button `Query` or ask questions based on retrieved papers with button `Ask`.",
-            icon='💡')
     st.markdown('''```sql
 CREATE TABLE chatdata.Wikipedia (
     `id` String, 

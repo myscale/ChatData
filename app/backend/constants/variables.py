@@ -1,5 +1,3 @@
-from enum import Enum
-
 from backend.types.global_config import GlobalConfig
 
 # ***** str variables ***** #
@@ -19,6 +17,15 @@ DIVIDER_HTML = """
     <div style="
         height: 4px;
         background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+        margin-top: 20px;
+        margin-bottom: 20px;
+    "></div>
+"""
+
+DIVIDER_THIN_HTML = """
+    <div style="
+        height: 2px;
+        background: linear-gradient(to right, blue, darkslateblue, indigo, violet);
         margin-top: 20px;
         margin-bottom: 20px;
     "></div>

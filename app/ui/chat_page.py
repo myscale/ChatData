@@ -8,15 +8,15 @@ from streamlit.delta_generator import DeltaGenerator
 
 from backend.chat_bot.json_decoder import CustomJSONDecoder
 from backend.constants.streamlit_keys import CHAT_CURRENT_USER_SESSIONS, EL_SESSION_SELECTOR, \
-    EL_CREATE_KB_STATUS, USER_PRIVATE_FILES, CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR, \
-    CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME, CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION, \
-    USER_PRIVATE_KNOWLEDGE_BASES, AVAILABLE_RETRIEVAL_TOOLS, EL_PRIVATE_KB_NEEDS_REMOVE, \
-    CHAT_KNOWLEDGE_TABLE
-from backend.constants.variables import DIVIDER_HTML, USER_NAME
+    EL_UPLOAD_FILES_STATUS, USER_PRIVATE_FILES, EL_BUILD_KB_WITH_FILES, \
+    EL_PERSONAL_KB_NAME, EL_PERSONAL_KB_DESCRIPTION, \
+    USER_PERSONAL_KNOWLEDGE_BASES, AVAILABLE_RETRIEVAL_TOOLS, EL_PERSONAL_KB_NEEDS_REMOVE, \
+    CHAT_KNOWLEDGE_TABLE, EL_UPLOAD_FILES
+from backend.constants.variables import DIVIDER_HTML, USER_NAME, RETRIEVER_TOOLS
 from backend.construct.build_chat_bot import build_chat_knowledge_table, initialize_session_manager
-from backend.chat_bot.chat import refresh_sessions, on_session_change_submit, refresh_agent, create_private_knowledge_base_as_tool, \
+from backend.chat_bot.chat import refresh_sessions, on_session_change_submit, refresh_agent, \
+    create_private_knowledge_base_as_tool, \
     remove_private_knowledge_bases, add_file, clear_files, clear_history, back_to_main, on_chat_submit
-from logger import logger
 
 
 def render_session_manager():
@@ -34,7 +34,6 @@ def render_session_manager():
             key="session_editor",
             use_container_width=True,
         )
-        # TODO 增加一个 refresh ？
         st.button("⏫ Submit", on_click=on_session_change_submit, type="primary")
 
 
@@ -54,12 +53,13 @@ def render_files_manager():
     with st.expander("📃 **Upload your personal files**", expanded=False):
         st.markdown("- Files will be parsed by [Unstructured API](https://unstructured.io/api-key).")
         st.markdown("- All files will be converted into vectors and stored in [MyScaleDB](https://myscale.com/).")
-        st.file_uploader(label="⏫ **Upload files**", key="EL_UPLOAD_FILES", accept_multiple_files=True)
+        st.file_uploader(label="⏫ **Upload files**", key=EL_UPLOAD_FILES, accept_multiple_files=True)
         # st.markdown("### Uploaded Files")
         st.dataframe(
             data=st.session_state[CHAT_KNOWLEDGE_TABLE].list_files(st.session_state[USER_NAME]),
             use_container_width=True,
         )
+        st.session_state[EL_UPLOAD_FILES_STATUS] = st.empty()
         col_1, col_2 = st.columns(2)
         with col_1:
             st.button(label="Upload files", on_click=add_file)
@@ -69,7 +69,6 @@ def render_files_manager():
 
 def _render_create_personal_knowledge_bases(div: DeltaGenerator):
     with div:
-        st.session_state[EL_CREATE_KB_STATUS] = st.empty()
         st.markdown("- If you haven't upload your personal files, please upload them first.")
         st.markdown("- Select some **files** to build your `personal knowledge base`.")
         st.markdown("- Once the your `personal knowledge base` is built, "
@@ -78,18 +77,18 @@ def _render_create_personal_knowledge_bases(div: DeltaGenerator):
             label="⚡️Select some files to build a **personal knowledge base**",
             options=st.session_state[USER_PRIVATE_FILES],
             placeholder="You should upload some files first",
-            key=CHAT_ELEMENT_KNOWLEDGE_TAB_MULTI_SELECTOR,
+            key=EL_BUILD_KB_WITH_FILES,
             format_func=lambda x: x["file_name"],
         )
         st.text_input(
             label="⚡️Personal knowledge base name",
             value="get_relevant_documents",
-            key=CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_NAME
+            key=EL_PERSONAL_KB_NAME
         )
         st.text_input(
             label="⚡️Personal knowledge base description",
             value="Searches from some personal files.",
-            key=CHAT_ELEMENT_KNOWLEDGE_TAB_TEXT_INPUT_TOOL_DESCRIPTION,
+            key=EL_PERSONAL_KB_DESCRIPTION,
         )
         st.button(
             label="Build 🔧",
@@ -100,16 +99,16 @@ def _render_create_personal_knowledge_bases(div: DeltaGenerator):
 def _render_remove_personal_knowledge_bases(div: DeltaGenerator):
     with div:
         st.markdown("> Here is all your personal knowledge bases.")
-        if USER_PRIVATE_KNOWLEDGE_BASES in st.session_state and len(st.session_state[USER_PRIVATE_KNOWLEDGE_BASES]) > 0:
-            st.dataframe(st.session_state[USER_PRIVATE_KNOWLEDGE_BASES])
+        if USER_PERSONAL_KNOWLEDGE_BASES in st.session_state and len(st.session_state[USER_PERSONAL_KNOWLEDGE_BASES]) > 0:
+            st.dataframe(st.session_state[USER_PERSONAL_KNOWLEDGE_BASES])
         else:
             st.warning("You don't have any personal knowledge bases, please create a new one.")
         st.multiselect(
             label="Choose a personal knowledge base to delete",
             placeholder="Choose a personal knowledge base to delete",
-            options=st.session_state[USER_PRIVATE_KNOWLEDGE_BASES],
+            options=st.session_state[USER_PERSONAL_KNOWLEDGE_BASES],
             format_func=lambda x: x["tool_name"],
-            key=EL_PRIVATE_KB_NEEDS_REMOVE,
+            key=EL_PERSONAL_KB_NEEDS_REMOVE,
         )
         st.button("Delete", on_click=remove_private_knowledge_bases, type="primary")
 
@@ -126,7 +125,7 @@ def render_knowledge_base_selector():
         st.markdown("- Knowledge bases come in two types: `public` and `private`.")
         st.markdown("- All users can access our `public` knowledge bases.")
         st.markdown("- Only you can access your `personal` knowledge bases.")
-        options = st.session_state.tools.keys()
+        options = st.session_state[RETRIEVER_TOOLS].keys()
         if AVAILABLE_RETRIEVAL_TOOLS in st.session_state:
             options = st.session_state[AVAILABLE_RETRIEVAL_TOOLS]
         st.multiselect(
@@ -146,7 +145,11 @@ def chat_page():
 
     # render sidebar
     with st.sidebar:
-        st.button(label="↩️ Log Out", help="log out and back to main page", on_click=back_to_main)
+        left, middle, right = st.columns([1, 1, 2])
+        with left:
+            st.button(label="↩️ Log Out", help="log out and back to main page", on_click=back_to_main)
+        with right:
+            st.markdown(f"👤 `{st.session_state[USER_NAME]}`")
         st.markdown(DIVIDER_HTML, unsafe_allow_html=True)
         render_session_manager()
         render_session_selection()
