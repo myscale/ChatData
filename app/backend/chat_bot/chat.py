@@ -38,7 +38,7 @@ def on_chat_submit():
         ret = st.session_state.agent(
             {"input": st.session_state.chat_input}, callbacks=[st_callback]
         )
-        print(ret)
+        logger.info(f"ret:{ret}")
 
 
 def clear_history():
@@ -189,6 +189,7 @@ def refresh_agent():
         else:
             selected_knowledge_bases = ["Wikipedia + Vector SQL"]
 
+        logger.info(f"selected_knowledge_bases: {selected_knowledge_bases}")
         if EL_SESSION_SELECTOR in st.session_state:
             system_prompt = st.session_state[EL_SESSION_SELECTOR]["system_prompt"]
         else:

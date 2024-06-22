@@ -19,7 +19,7 @@ def get_sessions(engine, model_class, user_id):
             .where(
                 model_class.session_id == user_id
             )
-            .order_by(model_class.create_time.desc())
+            .order_by(model_class.create_by.desc())
         )
     return json.loads(result)
 
@@ -56,7 +56,7 @@ class SessionManager:
                 .where(
                     self.session_model_class.user_id == user_id
                 )
-                .order_by(self.session_model_class.create_time.desc())
+                .order_by(self.session_model_class.create_by.desc())
             )
             sessions = []
             for r in result:
@@ -82,7 +82,7 @@ class SessionManager:
         with self.session_orm() as session:
             elem = self.session_model_class(
                 user_id=user_id, session_id=session_id, system_prompt=system_prompt,
-                create_time=datetime.now(), additions=json.dumps(kwargs)
+                create_by=datetime.now(), additionals=json.dumps(kwargs)
             )
             session.add(elem)
             session.commit()

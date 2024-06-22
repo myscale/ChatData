@@ -10,6 +10,7 @@ from backend.chat_bot.message_converter import DefaultClickhouseMessageConverter
 from backend.constants.prompts import DEFAULT_SYSTEM_PROMPT
 from backend.constants.streamlit_keys import AVAILABLE_RETRIEVAL_TOOLS
 from backend.constants.variables import GLOBAL_CONFIG, RETRIEVER_TOOLS
+from logger import logger
 
 try:
     from sqlalchemy.orm import declarative_base
@@ -70,6 +71,7 @@ def build_agents(
     )
     tools = st.session_state.get(AVAILABLE_RETRIEVAL_TOOLS, st.session_state.get(RETRIEVER_TOOLS))
     selected_tools = [tools[k] for k in tool_names]
+    logger.info(f"create agent, use tools: {selected_tools}")
     agent = create_agent_executor(
         agent_name="chat_memory",
         session_id=session_id,

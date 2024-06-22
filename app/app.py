@@ -26,7 +26,6 @@ def prepare_environment():
     os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
     os.environ["AUTH0_CLIENT_ID"] = st.secrets['AUTH0_CLIENT_ID']
     os.environ["AUTH0_DOMAIN"] = st.secrets['AUTH0_DOMAIN']
-    os.environ["AUTH0_CLIENT_SECRET"] = st.secrets['AUTH0_CLIENT_SECRET']
 
     update_global_config(GlobalConfig(
         openai_api_base=st.secrets['OPENAI_API_BASE'],
@@ -40,7 +39,7 @@ def prepare_environment():
         query_model="gpt-3.5-turbo-0125",
         chat_model="gpt-3.5-turbo-0125",
         untrusted_api="brznhwJKqzC8BkGnoynsauTS4sfqqW",
-        mode=st.secrets['MODE'],
+        mode=st.secrets.get('MODE', 'prod'),
     ))
 
 

@@ -11,7 +11,7 @@ from backend.constants.streamlit_keys import CHAT_CURRENT_USER_SESSIONS, EL_SESS
     EL_UPLOAD_FILES_STATUS, USER_PRIVATE_FILES, EL_BUILD_KB_WITH_FILES, \
     EL_PERSONAL_KB_NAME, EL_PERSONAL_KB_DESCRIPTION, \
     USER_PERSONAL_KNOWLEDGE_BASES, AVAILABLE_RETRIEVAL_TOOLS, EL_PERSONAL_KB_NEEDS_REMOVE, \
-    CHAT_KNOWLEDGE_TABLE, EL_UPLOAD_FILES
+    CHAT_KNOWLEDGE_TABLE, EL_UPLOAD_FILES, EL_SELECTED_KBS
 from backend.constants.variables import DIVIDER_HTML, USER_NAME, RETRIEVER_TOOLS
 from backend.construct.build_chat_bot import build_chat_knowledge_table, initialize_session_manager
 from backend.chat_bot.chat import refresh_sessions, on_session_change_submit, refresh_agent, \
@@ -133,7 +133,7 @@ def render_knowledge_base_selector():
             placeholder="Please select some knowledge bases to query",
             options=options,
             default=["Wikipedia + Self Querying"],
-            key="selected_tools",
+            key=EL_SELECTED_KBS,
             on_change=refresh_agent,
         )
 
@@ -181,7 +181,7 @@ def chat_page():
         else:
             if len(msg.content) > 0:
                 with st.chat_message(speaker):
-                    print(type(msg), msg.dict())
+                    # print(type(msg), msg.dict())
                     st.write(
                         f"*{datetime.datetime.fromtimestamp(msg.additional_kwargs['timestamp']).isoformat()}*"
                     )

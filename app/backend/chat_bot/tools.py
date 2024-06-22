@@ -68,7 +68,8 @@ def create_message_history_table(table_name: str, base_class):
         user_id = Column(Text)
         msg_id = Column(Text, primary_key=True)
         type = Column(Text)
-        additions = Column(Text)
+        # should be additions, formal developer mistake spell it.
+        addtionals = Column(Text)
         message = Column(Text)
         __table_args__ = (
             engines.MergeTree(
@@ -87,8 +88,10 @@ def create_session_table(table_name: str, DynamicBase):
         user_id = Column(Text)
         session_id = Column(Text, primary_key=True)
         system_prompt = Column(Text)
-        create_time = Column(types.DateTime)
-        additions = Column(Text)
+        # represent create time.
+        create_by = Column(types.DateTime)
+        # should be additions, formal developer mistake spell it.
+        additionals = Column(Text)
         __table_args__ = (
             engines.MergeTree(order_by=session_id),
             {'comment': 'Store Session and Prompts'}

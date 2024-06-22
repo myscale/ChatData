@@ -21,7 +21,7 @@ def hint_arxiv():
 
 def hint_sql_arxiv():
     st.markdown('''```sql
-CREATE TABLE chatdata.ChatArXiv (
+CREATE TABLE default.ChatArXiv (
     `abstract` String, 
     `id` String, 
     `vector` Array(Float32), 
@@ -50,7 +50,7 @@ def hint_wiki():
 
 def hint_sql_wiki():
     st.markdown('''```sql
-CREATE TABLE chatdata.Wikipedia (
+CREATE TABLE wiki.Wikipedia (
     `id` String, 
     `title` String, 
     `text` String, 
@@ -68,7 +68,7 @@ ENGINE = ReplacingMergeTree ORDER BY id
 
 MYSCALE_TABLES: Dict[str, TableConfig] = {
     'Wikipedia': TableConfig(
-        database="chatdata",
+        database="wiki",
         table="Wikipedia",
         table_contents="Snapshort from Wikipedia for 2022. All in English.",
         hint=hint_wiki,
@@ -93,7 +93,7 @@ MYSCALE_TABLES: Dict[str, TableConfig] = {
         tool_desc=("search_among_wikipedia", "Searches among Wikipedia and returns related wiki pages")
     ),
     'ArXiv Papers': TableConfig(
-        database="chatdata",
+        database="default",
         table="ChatArXiv",
         table_contents="Snapshort from Wikipedia for 2022. All in English.",
         hint=hint_arxiv,

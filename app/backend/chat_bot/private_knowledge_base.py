@@ -10,11 +10,12 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from backend.chat_bot.tools import parse_files, extract_embedding
 from backend.construct.build_retriever_tool import create_retriever_tool
+from logger import logger
 
 
 class ChatBotKnowledgeTable:
     def __init__(self, host, port, username, password,
-                 embedding: Embeddings, parser_api_key: str, db="chatdata",
+                 embedding: Embeddings, parser_api_key: str, db="chat",
                  kb_table="private_kb", tool_table="private_tool") -> None:
         super().__init__()
         personal_files_schema_ = f"""
@@ -51,15 +52,15 @@ class ChatBotKnowledgeTable:
             database=db,
             table=kb_table,
         )
-        client = get_client(
+        self.client = get_client(
             host=config.host,
             port=config.port,
             username=config.username,
             password=config.password,
         )
-        client.command("SET allow_experimental_object_type=1")
-        client.command(personal_files_schema_)
-        client.command(private_knowledge_base_schema_)
+        self.client.command("SET allow_experimental_object_type=1")
+        self.client.command(personal_files_schema_)
+        self.client.command(private_knowledge_base_schema_)
         self.parser_api_key = parser_api_key
         self.vector_store = MyScaleWithoutJSON(
             embedding=embedding,
@@ -137,25 +138,30 @@ class ChatBotKnowledgeTable:
         self.vector_store.client.command(query)
 
     def as_retrieval_tools(self, user_id, tool_name=None):
+        logger.info(f"")
         private_knowledge_bases = self.list_private_knowledge_bases(user_id=user_id, private_knowledge_base=tool_name)
-        retrievers = {
-            t["tool_name"]: create_retriever_tool(
-                self.vector_store.as_retriever(
-                    search_kwargs={
-                        "where_str": (
-                            f"user_id='{user_id}' "
-                            f"""AND file_name IN (
-                                SELECT arrayJoin(file_names) FROM (
-                                    SELECT file_names 
-                                    FROM {self.vector_store.config.database}.{self.private_knowledge_base_table}
-                                    WHERE user_id = '{user_id}' AND tool_name = '{t['tool_name']}')
-                        )"""
-                        )
-                    },
-                ),
-                tool_name=t["tool_name"],
-                description=t["tool_description"],
+        retrievers = {}
+        for private_kb in private_knowledge_bases:
+            file_names_sql = f"""
+            SELECT arrayJoin(file_names) FROM (
+                SELECT file_names 
+                FROM chat.private_tool
+                WHERE user_id = '{user_id}' AND tool_name = '{private_kb["tool_name"]}'
             )
-            for t in private_knowledge_bases
-        }
+            """
+            logger.info(f"user_id is {user_id}, file_names_sql is {file_names_sql}")
+            res = self.client.query(file_names_sql)
+            file_names = []
+            for line in res.result_rows:
+                file_names.append(line[0])
+            file_names = ', '.join(f"'{item}'" for item in file_names)
+            logger.info(f"user_id is {user_id}, file_names is {file_names}")
+            retrievers[private_kb["tool_name"]] = create_retriever_tool(
+                self.vector_store.as_retriever(
+                    search_kwargs={"where_str": f"user_id='{user_id}' AND file_name IN ({file_names})"},
+                ),
+                tool_name=private_kb["tool_name"],
+                description=private_kb["tool_description"],
+            )
         return retrievers
+

@@ -40,23 +40,21 @@ class DefaultClickhouseMessageConverter(DefaultMessageConverter):
         self.model_class = create_message_history_table(table_name, declarative_base())
 
     def to_sql_model(self, message: BaseMessage, session_id: str) -> Any:
-        timestamp = time.time()
-        msg_id = hashlib.sha256(f"{session_id}_{message}_{timestamp}".encode('utf-8')).hexdigest()
+        time_stamp = time.time()
+        msg_id = hashlib.sha256(
+            f"{session_id}_{message}_{time_stamp}".encode('utf-8')).hexdigest()
         user_id, _ = session_id.split("?")
         return self.model_class(
-            id=timestamp,
+            id=time_stamp,
             msg_id=msg_id,
             user_id=user_id,
             session_id=session_id,
             type=message.type,
-            additions=json.dumps(message.additional_kwargs),
-            message=json.dumps(
-                {
-                    "type": message.type,
-                    "additional_kwargs": {"timestamp": timestamp},
-                    "data": message.dict()
-                }
-            )
+            addtionals=json.dumps(message.additional_kwargs),
+            message=json.dumps({
+                "type": message.type,
+                "additional_kwargs": {"timestamp": time_stamp},
+                "data": message.dict()})
         )
 
     def from_sql_model(self, sql_message: Any) -> BaseMessage:

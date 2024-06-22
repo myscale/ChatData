@@ -53,16 +53,16 @@ def render_home_header():
         )
     with col2.container():
         mention(
-            label="streamlit-extras",
-            icon="🪢",
-            url="https://github.com/arnaudmiribel/streamlit-extras",
+            label="langchain",
+            icon="🦜🔗",
+            url="https://www.langchain.com/",
             write=True
         )
     with col3.container():
         mention(
-            label="langchain",
-            icon="🦜🔗",
-            url="https://www.langchain.com/",
+            label="streamlit-extras",
+            icon="🪢",
+            url="https://github.com/arnaudmiribel/streamlit-extras",
             write=True
         )
 

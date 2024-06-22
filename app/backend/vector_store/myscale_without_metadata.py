@@ -10,7 +10,10 @@ from logger import logger
 class MyScaleWithoutMetadataJson(MyScale):
     def __init__(self, embedding: Embeddings, config: Optional[MyScaleSettings] = None, must_have_cols: List[str] = [],
                  **kwargs: Any) -> None:
-        super().__init__(embedding, config, **kwargs)
+        try:
+            super().__init__(embedding, config, **kwargs)
+        except Exception as e:
+            logger.error(e)
         self.must_have_cols: List[str] = must_have_cols
 
     def _build_qstr(
