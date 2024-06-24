@@ -40,7 +40,7 @@ def render_retrievers():
     selected_table = _render_table_selector()
 
     tab_sql, tab_self_query = st.tabs(
-        tabs=['Vector Search', 'SelfQuery Retrievers']
+        tabs=['Vector SQL', 'Self-querying Retriever']
     )
 
     with tab_sql:
@@ -61,10 +61,10 @@ def render_tab_sql(selected_table: str):
     cols[0].text_input("Input your question:", key='query_sql')
     with cols[1].container():
         add_vertical_space(2)
-        st.button("VectorSearch from MyScaleDB ➡️", key=RetrieverButtons.vector_sql_query_from_db)
+        st.button("Retrieve from MyScaleDB ➡️", key=RetrieverButtons.vector_sql_query_from_db)
     with cols[2].container():
         add_vertical_space(2)
-        st.button("VectorSearch with Sources(LLM) ➡️", key=RetrieverButtons.vector_sql_query_with_llm)
+        st.button("Retrieve and answer with LLM ➡️", key=RetrieverButtons.vector_sql_query_with_llm)
 
     if st.session_state[RetrieverButtons.vector_sql_query_from_db]:
         process_sql_query(selected_table, RetrieverButtons.vector_sql_query_from_db)
@@ -85,10 +85,10 @@ def render_tab_self_query(selected_table):
 
     with cols[1].container():
         add_vertical_space(2)
-        st.button("SelfQuery from MyScaleDB ➡️", key='search_self')
+        st.button("Retrieve from MyScaleDB ➡️", key='search_self')
     with cols[2].container():
         add_vertical_space(2)
-        st.button("SelfQuery with Sources(LLM) ➡️", key='ask_self')
+        st.button("Retrieve and answer with LLM ➡️", key='ask_self')
 
     if st.session_state.search_self:
         process_self_query(selected_table, RetrieverButtons.self_query_from_db)

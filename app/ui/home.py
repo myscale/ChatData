@@ -29,11 +29,11 @@ def render_home():
 
 def render_home_header():
     logger.info("render home header")
-    st.header("ChatData --- Your Intelligent Assistant")
+    st.header("ChatData - Your Intelligent Assistant")
     st.markdown(DIVIDER_THIN_HTML, unsafe_allow_html=True)
     st.markdown("> [ChatData](https://github.com/myscale/ChatData) \
                      is developed by [MyScale](https://myscale.com/), \
-                     it's a integration of [LangChain](https://www.langchain.com/) \
+                     it's an integration of [LangChain](https://www.langchain.com/) \
                      and [MyScaleDB](https://github.com/myscale/myscaledb)")
 
     tagger_component(
@@ -80,13 +80,11 @@ def _render_self_query_chain_content():
     with col2.container():
         st.header("VectorSearch & SelfQuery with Sources")
         st.info("In this sample, you will learn how **LangChain** integrates with **MyScaleDB**.")
-        st.markdown(
-            "- For `SelfQuery`, the LLM (GPT) converts user queries into Vector Search SQL statements, \
-             executes vector searches in MyScaleDB, and retrieves relevant content.")
-        st.markdown(
-            "- For `SelfQuery with Sources`, after retrieving relevant content from MyScaleDB, \
-             the user query along with the retrieved content is sent to the LLM (GPT), \
-            which then provides a comprehensive answer.")
+        st.markdown("""This example demonstrates two methods for integrating MyScale into LangChain: [Vector SQL](https://api.python.langchain.com/en/latest/sql/langchain_experimental.sql.vector_sql.VectorSQLDatabaseChain.html) and [Self-querying retriever](https://python.langchain.com/v0.2/docs/integrations/retrievers/self_query/myscale_self_query/). For each method, you can choose one of the following options:
+
+1. `Retrieve from MyScaleDB ➡️` - The LLM (GPT) converts user queries into SQL statements with vector search, executes these searches in MyScaleDB, and retrieves relevant content.
+   
+2. `Retrieve and answer with LLM ➡️` - After retrieving relevant content from MyScaleDB, the user query along with the retrieved content is sent to the LLM (GPT), which then provides a comprehensive answer.""")
         add_vertical_space(3)
         _, middle, _ = st.columns([2, 1, 2], gap='small')
         with middle.container():
