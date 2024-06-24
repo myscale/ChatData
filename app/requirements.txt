@@ -1,6 +1,8 @@
-# langchain @ git+https://github.com/myscale/langchain.git@preview#egg=langchain&subdirectory=libs/langchain
-# langchain-experimental @ git+https://github.com/myscale/langchain.git@preview#egg=langchain-experimental&subdirectory=libs/experimental
-# https://github.com/PromtEngineer/localGPT/issues/722
+langchain==0.2.1
+langchain-community==0.2.1
+langchain-core==0.2.1
+langchain-experimental==0.0.59
+langchain-openai==0.1.7
 sentence_transformers==2.2.2
 InstructorEmbedding
 pandas
