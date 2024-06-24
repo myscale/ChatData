@@ -43,7 +43,7 @@ In conclusion, with ChatData, you can effortlessly navigate through vast amounts
 
 ➡️ Dive in and experience ChatData on [Hugging Face](https://huggingface.co/spaces/myscale/ChatData)🤗
 
-![ChatData Homepage](assets/chatdata-homepage.png)
+![ChatData Homepage](assets/home.png)
 
 ### Data schema
 
@@ -117,15 +117,6 @@ And for overall table schema, please refer to [table creation section in docs/se
 
 If you want to use this database with `langchain.chains.sql_database.base.SQLDatabaseChain` or `langchain.retrievers.SQLDatabaseRetriever`, please follow guides on [data preparation section](docs/vector-sql.md#prepare-the-database) and [chain creation section](docs/vector-sql.md#create-the-sqldatabasechain) in docs/vector-sql.md
 
-### How to run ChatData
-
-<a name="how-to-run"></a>
-
-```bash
-python3 -m pip install requirements.txt
-python3 -m streamlit run app.py
-```
-
 ### Where can I get those arXiv data?
 
 - [From parquet files on S3](docs/self-query.md#insert-data)
@@ -167,17 +158,11 @@ cd app/
 2. Create an virtual environment
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 ```
 
 3. Install dependencies
-
-> This app is currently using [MyScale's technical preview of LangChain](https://github.com/myscale/langchain/tree/preview).
->
->> It contains improved SQLDatabaseChain in [this PR](https://github.com/hwchase17/langchain/pull/7454)
->>
->> It contains [improved prompts](https://github.com/hwchase17/langchain/pull/6737#discussion_r1243527112) for comparators `LIKE` and `CONTAIN` in [MyScale self-query retriever](https://github.com/hwchase17/langchain/pull/6143).
 
 ```bash
 python3 -m pip install -r requirements.txt

@@ -1,15 +1,17 @@
-langchain @ git+https://github.com/myscale/langchain.git@preview#egg=langchain&subdirectory=libs/langchain
-langchain-experimental @ git+https://github.com/myscale/langchain.git@preview#egg=langchain-experimental&subdirectory=libs/experimental
-# https://github.com/PromtEngineer/localGPT/issues/722
-sentence_transformers==2.2.2
+langchain==0.2.1
+langchain-community==0.2.1
+langchain-core==0.2.1
+langchain-experimental==0.0.59
+langchain-openai==0.1.7
+sentence-transformers==2.2.2
 InstructorEmbedding
 pandas
-sentence_transformers
-streamlit==1.25
+streamlit
+streamlit-extras
 streamlit-auth0-component
 altair==4.2.2
 clickhouse-connect
-openai==0.28
+openai==1.35.3
 lark
 tiktoken
 sql-formatter
