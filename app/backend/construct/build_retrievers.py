@@ -65,7 +65,7 @@ def build_self_query_retriever(table_name: str) -> SelfQueryRetriever:
 def build_vector_sql_db_chain_retriever(table_name: str) -> VectorSQLDatabaseChainRetriever:
     """Get a group of relative docs from MyScaleDB"""
     with st.spinner(f'Building Vector SQL Database Retriever for MyScaleDB/{table_name}...'):
-        if GLOBAL_CONFIG.mode == "dev":
+        if GLOBAL_CONFIG.myscale_enable_https == False:
             engine = create_engine(
                 f'clickhouse://{GLOBAL_CONFIG.myscale_user}:{GLOBAL_CONFIG.myscale_password}@'
                 f'{GLOBAL_CONFIG.myscale_host}:{GLOBAL_CONFIG.myscale_port}'

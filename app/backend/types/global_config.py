@@ -19,4 +19,4 @@ class GlobalConfig:
     chat_model: Optional[str] = ""
 
     untrusted_api: Optional[str] = ""
-    mode: Optional[str] = "dev"
+    myscale_enable_https: Optional[bool] = True

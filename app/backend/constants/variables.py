@@ -55,4 +55,4 @@ def update_global_config(new_config: GlobalConfig):
     GLOBAL_CONFIG.query_model = new_config.query_model
     GLOBAL_CONFIG.chat_model = new_config.chat_model
     GLOBAL_CONFIG.untrusted_api = new_config.untrusted_api
-    GLOBAL_CONFIG.mode = new_config.mode
+    GLOBAL_CONFIG.myscale_enable_https = new_config.myscale_enable_https

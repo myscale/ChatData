@@ -36,7 +36,7 @@ class SessionManager:
             session_table='sessions',
             msg_table='chat_memory'
     ) -> None:
-        if GLOBAL_CONFIG.mode == "dev":
+        if GLOBAL_CONFIG.myscale_enable_https == False:
             conn_str = f'clickhouse://{username}:{password}@{host}:{port}/{db}?protocol=http'
         else:
             conn_str = f'clickhouse://{username}:{password}@{host}:{port}/{db}?protocol=https'

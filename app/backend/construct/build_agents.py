@@ -36,7 +36,7 @@ def create_agent_executor(
     conn_str = f'clickhouse://{os.environ["MYSCALE_USER"]}:{os.environ["MYSCALE_PASSWORD"]}@{os.environ["MYSCALE_HOST"]}:{os.environ["MYSCALE_PORT"]}'
     chat_memory = SQLChatMessageHistory(
         session_id,
-        connection_string=f'{conn_str}/chat?protocol=http' if GLOBAL_CONFIG.mode == "dev" else f'{conn_str}/chat?protocol=https',
+        connection_string=f'{conn_str}/chat?protocol=http' if GLOBAL_CONFIG.myscale_enable_https == False else f'{conn_str}/chat?protocol=https',
         custom_message_converter=DefaultClickhouseMessageConverter(agent_name))
     memory = AgentTokenBufferMemory(llm=llm, chat_memory=chat_memory)
 

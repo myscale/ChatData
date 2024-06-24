@@ -38,7 +38,7 @@ def prepare_environment():
         query_model="gpt-3.5-turbo-0125",
         chat_model="gpt-3.5-turbo-0125",
         untrusted_api=st.secrets['UNSTRUCTURED_API'],
-        mode=st.secrets.get('MODE', 'prod'),
+        myscale_enable_https=st.secrets.get('MYSCALE_ENABLE_HTTPS', True),
     ))
 
 
