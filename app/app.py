@@ -19,9 +19,8 @@ from ui.retrievers import render_retrievers
 
 def prepare_environment():
     os.environ['TOKENIZERS_PARALLELISM'] = 'true'
-    # UNSTRUCTURED_API = st.secrets['UNSTRUCTURED_API']
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
-    os.environ["LANGCHAIN_API_KEY"] = "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"
+    os.environ["LANGCHAIN_TRACING_V2"] = "false"
+    # os.environ["LANGCHAIN_API_KEY"] = ""
     os.environ["OPENAI_API_BASE"] = st.secrets['OPENAI_API_BASE']
     os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
     os.environ["AUTH0_CLIENT_ID"] = st.secrets['AUTH0_CLIENT_ID']
@@ -38,7 +37,7 @@ def prepare_environment():
         myscale_port=st.secrets['MYSCALE_PORT'],
         query_model="gpt-3.5-turbo-0125",
         chat_model="gpt-3.5-turbo-0125",
-        untrusted_api="brznhwJKqzC8BkGnoynsauTS4sfqqW",
+        untrusted_api=st.secrets['UNSTRUCTURED_API'],
         mode=st.secrets.get('MODE', 'prod'),
     ))
 
