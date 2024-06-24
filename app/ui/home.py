@@ -104,7 +104,8 @@ def _render_chat_bot_content():
     with col2.container():
         st.header("Chat Bot")
         st.info("Now you can try our chatbot, this chatbot is built with MyScale and LangChain.")
-        st.markdown("- You need to log in. We use `user_name` to identify each customer.")
+        st.markdown("- You need to go to [https://myscale-chatdata.hf.space/](https://myscale-chatdata.hf.space/) "
+                    "to log in successfully, otherwise the auth service will not work.")
         st.markdown("- You can upload your own PDF files and build your own knowledge base. \
                      (This is just a sample application. Please do not upload important or confidential files.)")
         st.markdown("- A default session will be assigned as your initial chat session. \
