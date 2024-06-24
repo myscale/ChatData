@@ -70,7 +70,7 @@ def render_home_header():
 def _render_self_query_chain_content():
     col1, col2 = st.columns([1, 1], gap='large')
     with col1.container():
-        st.image(image='../assets/home_page_background_1.png',
+        st.image(image='./assets/home_page_background_1.png',
                  caption=None,
                  width=None,
                  use_column_width=True,
@@ -94,7 +94,7 @@ def _render_self_query_chain_content():
 def _render_chat_bot_content():
     col1, col2 = st.columns(2, gap='large')
     with col1.container():
-        st.image(image='../assets/home_page_background_2.png',
+        st.image(image='./assets/home_page_background_2.png',
                  caption=None,
                  width=None,
                  use_column_width=True,
