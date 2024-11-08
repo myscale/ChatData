@@ -191,7 +191,7 @@ CREATE TABLE default.ChatArXiv (
     `authors` Array(String), 
     `comment` String,
     `primary_category` String,
-    CONSTRAINT vec_len CHECK length(vector) = 768) 
+    CONSTRAINT vec_len CHECK length(vector) = 1024) 
 ENGINE = ReplacingMergeTree ORDER BY id SETTINGS index_granularity = 8192
 ```
 

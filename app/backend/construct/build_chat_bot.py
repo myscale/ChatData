@@ -1,3 +1,6 @@
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+from sentence_transformers import SentenceTransformer
+
 from backend.chat_bot.private_knowledge_base import ChatBotKnowledgeTable
 from backend.constants.streamlit_keys import CHAT_KNOWLEDGE_TABLE, CHAT_SESSION, CHAT_SESSION_MANAGER
 import streamlit as st
@@ -14,8 +17,9 @@ def build_chat_knowledge_table():
             port=GLOBAL_CONFIG.myscale_port,
             username=GLOBAL_CONFIG.myscale_user,
             password=GLOBAL_CONFIG.myscale_password,
-            # embedding=st.session_state[TABLE_EMBEDDINGS_MAPPING]["Wikipedia"],
-            embedding=st.session_state[TABLE_EMBEDDINGS_MAPPING]["ArXiv Papers"],
+            embedding=st.session_state[TABLE_EMBEDDINGS_MAPPING]["Wikipedia"],
+            # embedding=st.session_state[TABLE_EMBEDDINGS_MAPPING]["ArXiv Papers"],
+            # embedding=SentenceTransformer("jinaai/jina-embeddings-v3").emb_model(),
             parser_api_key=GLOBAL_CONFIG.untrusted_api,
         )
 

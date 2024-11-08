@@ -8,6 +8,7 @@ from clickhouse_sqlalchemy import types, engines
 from langchain.schema.embeddings import Embeddings
 from sqlalchemy import Column, Text
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+import streamlit as st
 
 
 def parse_files(api_key, user_id, files: List[UploadedFile]):
@@ -19,8 +20,14 @@ def parse_files(api_key, user_id, files: List[UploadedFile]):
         data = {"strategy": "auto", "ocr_languages": ["eng"]}
         file_hash = hashlib.sha256(file.read()).hexdigest()
         file_data = {"files": (file.name, file.getvalue(), file.type)}
+
+        api_host = st.secrets.get('UNSTRUCTURED_API_HOST', '')
+        api_port = st.secrets.get('UNSTRUCTURED_API_PORT', '')
+        api_url = f"http://{api_host}:{api_port}/general/v0/general"
+        if api_url == "" or api_port == "":
+            api_url = "https://api.unstructured.io/general/v0/general"
         response = requests.post(
-            url="https://api.unstructured.io/general/v0/general",
+            url=api_url,
             headers=headers,
             data=data,
             files=file_data

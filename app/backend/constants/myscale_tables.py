@@ -33,7 +33,7 @@ CREATE TABLE default.ChatArXiv (
     `comment` String,
     `primary_category` String,
     VECTOR INDEX vec_idx vector TYPE MSTG('fp16_storage=1', 'metric_type=Cosine', 'disk_mode=3'), 
-    CONSTRAINT vec_len CHECK length(vector) = 768) 
+    CONSTRAINT vec_len CHECK length(vector) = 1024) 
 ENGINE = ReplacingMergeTree ORDER BY id
 ```''')
 
@@ -61,7 +61,7 @@ CREATE TABLE wiki.Wikipedia (
     `langs` UInt32, 
     `emb` Array(Float32), 
     VECTOR INDEX vec_idx emb TYPE MSTG('fp16_storage=1', 'metric_type=Cosine', 'disk_mode=3'), 
-    CONSTRAINT emb_len CHECK length(emb) = 768) 
+    CONSTRAINT emb_len CHECK length(emb) = 1024) 
 ENGINE = ReplacingMergeTree ORDER BY id
 ```''')
 
@@ -88,41 +88,31 @@ MYSCALE_TABLES: Dict[str, TableConfig] = {
         text_col_name="text",
         metadata_col_name="metadata",
         emb_model=lambda: SentenceTransformerEmbeddings(
-            model_name='sentence-transformers/paraphrase-multilingual-mpnet-base-v2'
-        ),
-        tool_desc=("search_among_wikipedia", "Searches among Wikipedia and returns related wiki pages")
+                model_name="jinaai/jina-embeddings-v3",
+                model_kwargs={'trust_remote_code': True},
+            ),
+        tool_desc=("search_among_wikipedia", "Searches among Wikipedia and returns related wiki pages"),
+        create_db_sql="""
+            CREATE DATABASE IF NOT EXISTS wiki
+        """,
+        create_table_sql="""
+            CREATE TABLE IF NOT EXISTS wiki.Wikipedia
+            (
+                `id` String,
+                `title` String,
+                `text` String,
+                `url` String,
+                `wiki_id` UInt64,
+                `views` Float32,
+                `paragraph_id` UInt64,
+                `langs` UInt32,
+                `emb` Array(Float32),
+                VECTOR INDEX emb_idx emb TYPE SCANN('metric_type=Cosine'),
+                CONSTRAINT emb_len CHECK length(emb) = 1024
+            )
+            ENGINE = ReplacingMergeTree
+            ORDER BY id
+            SETTINGS index_granularity = 128
+        """
     ),
-    'ArXiv Papers': TableConfig(
-        database="default",
-        table="ChatArXiv",
-        table_contents="Snapshort from Wikipedia for 2022. All in English.",
-        hint=hint_arxiv,
-        hint_sql=hint_sql_arxiv,
-        doc_prompt=PromptTemplate(
-            input_variables=["page_content", "id", "title", "ref_id", "authors", "pubdate", "categories"],
-            template="Title for Doc #{ref_id}: {title}\n\tAbstract: {page_content}\n\tAuthors: {authors}\n\t"
-                     "Date of Publication: {pubdate}\n\tCategories: {categories}\nSOURCE: {id}"
-        ),
-        metadata_col_attributes=[
-            AttributeInfo(name="pubdate", description="The year the paper is published", type="timestamp"),
-            AttributeInfo(name="authors", description="List of author names", type="list[string]"),
-            AttributeInfo(name="title", description="Title of the paper", type="string"),
-            AttributeInfo(name="categories", description="arxiv categories to this paper", type="list[string]"),
-            AttributeInfo(name="length(categories)", description="length of arxiv categories to this paper", type="int")
-        ],
-        must_have_col_names=['title', 'id', 'categories', 'abstract', 'authors', 'pubdate'],
-        vector_col_name="vector",
-        text_col_name="abstract",
-        metadata_col_name="metadata",
-        emb_model=lambda: HuggingFaceInstructEmbeddings(
-            model_name='hkunlp/instructor-xl',
-            embed_instruction="Represent the question for retrieving supporting scientific papers: "
-        ),
-        tool_desc=(
-            "search_among_scientific_papers",
-            "Searches among scientific papers from ArXiv and returns research papers"
-        )
-    )
 }
-
-ALL_TABLE_NAME: List[str] = [config.table for config in MYSCALE_TABLES.values()]

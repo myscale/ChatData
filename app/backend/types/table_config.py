@@ -23,3 +23,5 @@ class TableConfig:
     metadata_col_attributes: List[AttributeInfo]
     emb_model: Callable
     tool_desc: tuple
+    create_db_sql: str
+    create_table_sql: str

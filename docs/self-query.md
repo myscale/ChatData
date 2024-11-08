@@ -54,7 +54,7 @@ CREATE TABLE default.langchain (
     `id` String,
     `vector` Array(Float32),
     `metadata` Object('JSON'),
-    CONSTRAINT vec_len CHECK length(vector) = 768)
+    CONSTRAINT vec_len CHECK length(vector) = 1024)
 ENGINE = ReplacingMergeTree ORDER BY id
 ```
 

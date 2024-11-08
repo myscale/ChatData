@@ -18,6 +18,9 @@ class ChatBotKnowledgeTable:
                  embedding: Embeddings, parser_api_key: str, db="chat",
                  kb_table="private_kb", tool_table="private_tool") -> None:
         super().__init__()
+        personal_knowledge_base_db = f"""
+            CREATE DATABASE IF NOT EXISTS {db}
+        """
         personal_files_schema_ = f"""
             CREATE TABLE IF NOT EXISTS {db}.{kb_table}(
                 entity_id String,
@@ -26,8 +29,8 @@ class ChatBotKnowledgeTable:
                 user_id String,
                 created_by DateTime,
                 vector Array(Float32),
-                CONSTRAINT cons_vec_len CHECK length(vector) = 768,
-                VECTOR INDEX vidx vector TYPE MSTG('metric_type=Cosine')
+                CONSTRAINT cons_vec_len CHECK length(vector) = 1024,
+                VECTOR INDEX vidx vector TYPE SCANN('metric_type=Cosine')
             ) ENGINE = ReplacingMergeTree ORDER BY entity_id
         """
 
@@ -51,6 +54,7 @@ class ChatBotKnowledgeTable:
             password=password,
             database=db,
             table=kb_table,
+            index_type="SCANN"
         )
         self.client = get_client(
             host=config.host,
@@ -59,6 +63,7 @@ class ChatBotKnowledgeTable:
             password=config.password,
         )
         self.client.command("SET allow_experimental_object_type=1")
+        self.client.command(personal_knowledge_base_db)
         self.client.command(personal_files_schema_)
         self.client.command(private_knowledge_base_schema_)
         self.parser_api_key = parser_api_key

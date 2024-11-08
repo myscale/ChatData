@@ -35,6 +35,7 @@ def on_chat_submit():
         st_callback = ChatDataAgentCallBackHandler(
             container, collapse_completed_thoughts=False
         )
+        logger.info(f"query input is: { st.session_state.chat_input}")
         ret = st.session_state.agent(
             {"input": st.session_state.chat_input}, callbacks=[st_callback]
         )

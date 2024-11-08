@@ -58,7 +58,8 @@ def create_agent_executor(
 def build_agents(
         session_id: str,
         tool_names: List[str],
-        model: str = "gpt-3.5-turbo-0125",
+        # model: str = "gpt-3.5-turbo-0125",
+        model: str = "gpt-4o",
         temperature: float = 0.6,
         system_prompt: str = DEFAULT_SYSTEM_PROMPT
 ):

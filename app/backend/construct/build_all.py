@@ -1,10 +1,12 @@
+from clickhouse_connect import get_client
+
 from logger import logger
 from typing import Dict, Any, Union
 
 import streamlit as st
 
 from backend.constants.myscale_tables import MYSCALE_TABLES
-from backend.constants.variables import CHAINS_RETRIEVERS_MAPPING
+from backend.constants.variables import CHAINS_RETRIEVERS_MAPPING, GLOBAL_CONFIG
 from backend.construct.build_chains import build_retrieval_qa_with_sources_chain
 from backend.construct.build_retriever_tool import create_retriever_tool
 from backend.construct.build_retrievers import build_self_query_retriever, build_vector_sql_db_chain_retriever
@@ -51,6 +53,8 @@ def update_retriever_tools():
 
 @st.cache_resource
 def build_chains_retriever_for_table(table_name: str) -> ChainsAndRetrievers:
+    # make sure table is exist.
+
     metadata_col_attributes = MYSCALE_TABLES[table_name].metadata_col_attributes
 
     self_query_retriever = build_self_query_retriever(table_name)
@@ -89,7 +93,15 @@ def build_chains_retriever_for_table(table_name: str) -> ChainsAndRetrievers:
 @st.cache_resource
 def build_chains_and_retrievers() -> Dict[str, Dict[str, Any]]:
     chains_and_retrievers = {}
+    client = get_client(
+        host=GLOBAL_CONFIG.myscale_host,
+        port=GLOBAL_CONFIG.myscale_port,
+        username=GLOBAL_CONFIG.myscale_user,
+        password=GLOBAL_CONFIG.myscale_password,
+    )
     for table in MYSCALE_TABLES:
+        client.command(MYSCALE_TABLES[table].create_db_sql)
+        client.command(MYSCALE_TABLES[table].create_table_sql)
         logger.info(f"Building chains, retrievers for table {table}")
         chains_and_retrievers[table] = build_chains_retriever_for_table(table).to_dict()
     return chains_and_retrievers

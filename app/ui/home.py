@@ -125,8 +125,8 @@ def _render_chat_bot_content():
 
 def render_home_content():
     logger.info("render home content")
-    _render_self_query_chain_content()
-    add_vertical_space(3)
+    # _render_self_query_chain_content()
+    # add_vertical_space(3)
     _render_chat_bot_content()
 
 
@@ -144,14 +144,15 @@ def render_home_footer():
     #     "available [here](https://myscale-chatdata.hf.space/)."
     # )
 
-    if st.session_state.auth0 is not None:
-        st.session_state[USER_INFO] = dict(st.session_state.auth0)
-        if 'email' in st.session_state[USER_INFO]:
-            email = st.session_state[USER_INFO]["email"]
-        else:
-            email = f"{st.session_state[USER_INFO]['nickname']}@{st.session_state[USER_INFO]['sub']}"
-        st.session_state["user_name"] = email
-        del st.session_state.auth0
-        st.rerun()
-    if st.session_state.jump_query_ask:
-        st.rerun()
+    # if st.session_state.auth0 is not None:
+    #     st.session_state[USER_INFO] = dict(st.session_state.auth0)
+    #     if 'email' in st.session_state[USER_INFO]:
+    #         email = st.session_state[USER_INFO]["email"]
+    #     else:
+    #         email = f"{st.session_state[USER_INFO]['nickname']}@{st.session_state[USER_INFO]['sub']}"
+    #     st.session_state["user_name"] = email
+    #     del st.session_state.auth0
+    #     st.rerun()
+    # if st.session_state.jump_query_ask:
+    #     st.rerun()
+
