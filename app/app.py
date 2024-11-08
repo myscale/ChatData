@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 def prepare_environment():
     os.environ['TOKENIZERS_PARALLELISM'] = 'true'
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_TRACING_V2"] = "false"
     # os.environ["LANGCHAIN_API_KEY"] = ""
     os.environ["OPENAI_API_BASE"] = st.secrets['OPENAI_API_BASE']
     os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
