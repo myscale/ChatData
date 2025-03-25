@@ -165,4 +165,5 @@ cython_debug/
 data/
 .streamlit/
 #*.ipynb
-.DS_Store
+.DS_Store*.log
+temp/

@@ -1,0 +1,29 @@
+# ChatData
+
+                                                                                                      ChatData
+
+Overview
+
+ChatData is a structured format for storing and processing conversational data. It is designed to facilitate analysis, training machine learning models, and building conversational AI systems.
+
+Features
+
+Structured Data Storage: Organizes chat logs in a standardized format.
+
+Scalability: Supports large-scale conversational datasets.
+
+Interoperability: Compatible with various AI frameworks and tools.
+
+Analytics Support: Enables sentiment analysis, topic modeling, and user behavior insights.
+
+Data Format
+
+ChatData typically follows a JSON or CSV format with fields such as:
+
+timestamp: The time when the message was sent.
+
+sender: The identity of the message sender (user or system).
+
+message: The textual content of the message.
+
+metadata: Additional information such as sentiment score or intent.
